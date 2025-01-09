@@ -127,7 +127,7 @@ const SignUp = () => {
 	const [user] = useState(initialState);
 	const dueDate = moment().add(trial, "day").format();
 	const handleSignUp = async values => {
-		Object.assign(values, { recurrence: "MENSAL" });
+		Object.assign(values, { recurrence: "MENSUAL" });
 		Object.assign(values, { dueDate: dueDate });
 		Object.assign(values, { status: "t" });
 		Object.assign(values, { campaignsEnabled: true });
@@ -193,7 +193,7 @@ const SignUp = () => {
 										variant="outlined"
 										fullWidth
 										id="name"
-										label="Nome da Empresa"
+										label="Nombre de tu Empresa"
 									/>
 								</Grid>
 
@@ -230,8 +230,8 @@ const SignUp = () => {
 											{...field}
 											variant="outlined"
 											fullWidth
-											label="DDD988888888"
-											inputProps={{ maxLength: 11 }} // Definindo o limite de caracteres
+											label="Indicativo pais y numero de Whatsapp"
+											inputProps={{ maxLength: 12 }} // Definindo o limite de caracteres
 										/>
 									)}
 								</Field>
@@ -258,16 +258,16 @@ const SignUp = () => {
 										variant="outlined"
 										fullWidth
 										id="plan-selection"
-										label="Plano"
+										label="Tipo de Plan"
 										name="planId"
 										required
 									>
                                         <MenuItem value="disabled" disabled>
-                                        	<em>Selecione seu plano de assinatura</em>
+                                        	<em>Por favor, seleccione el plan que más se ajuste a sus necesidades.</em>
 										</MenuItem>
 										{plans.map((plan, key) => (
 											<MenuItem key={key} value={plan.id}>
-										        {plan.name} - {plan.connections} WhatsApps - {plan.users} Usuários - R$ {plan.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+										        {plan.name} - {plan.connections} WhatsApps - {plan.users} Usuários - US {plan.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
 											</MenuItem>
 										))}
 									</Field>

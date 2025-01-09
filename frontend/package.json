@@ -2,7 +2,7 @@
   "name": "Elevara CRM",
   "version": "0.1.0",
   "versionSystem": "5.0.0",
-  "nomeEmpresa": "appBot",
+  "nomeEmpresa": "Elevaracrm",
   "private": true,
   "dependencies": {
     "@date-io/date-fns": "^2.14.0",

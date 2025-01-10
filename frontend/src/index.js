@@ -1,4 +1,6 @@
-import React from "react";
+console.log("Rendering App component...");
+console.log("Rendering CssBaseline component...");
+console.log("Rendering React app to DOM...");import React from "react";
 import ReactDOM from "react-dom";
 import CssBaseline from "@material-ui/core/CssBaseline";
 

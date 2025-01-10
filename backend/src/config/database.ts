@@ -6,7 +6,8 @@ module.exports = {
     collate: "utf8mb4_bin"
   },
   dialect: process.env.DB_DIALECT || "mysql",
-  timezone: "-03:00",
+  // Cambiar la configuración de timezone para que sea dinámica
+  timezone: process.env.DB_TIMEZONE || "UTC", // Por defecto a UTC si no se proporciona
   host: process.env.DB_HOST,
   port: process.env.DB_PORT || 3306,
   database: process.env.DB_NAME,

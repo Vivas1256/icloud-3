@@ -356,7 +356,7 @@ const msgLocation = (image, latitude, longitude) => {
   if (image) {
     var b64 = Buffer.from(image).toString("base64");
 
-    let data = `data:image/png;base64, ${b64} | https://maps.google.com/maps?q=${latitude}%2C${longitude}&z=17&hl=pt-BR|${latitude}, ${longitude} `;
+    let data = `data:image/png;base64, ${b64} | https://maps.google.com/maps?q=${latitude}%2C${longitude}&z=17&hl=en-us|${latitude}, ${longitude} `;
     return data;
   }
 };
@@ -580,7 +580,7 @@ const convertTextToSpeechAndSaveToFile = (
   filename: string,
   subscriptionKey: string,
   serviceRegion: string,
-  voice: string = "pt-BR-FabioNeural",
+  voice: string = "en-us-FabioNeural",
   audioToFormat: string = "mp3"
 ): Promise<void> => {
   return new Promise((resolve, reject) => {

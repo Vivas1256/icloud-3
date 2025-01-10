@@ -190,7 +190,7 @@ export default function Pricing(props) {
                     {
 
                       <React.Fragment>
-                        R${tier.price.toLocaleString('pt-br', { minimumFractionDigits: 2 })}
+                        R${tier.price.toLocaleString('en-us', { minimumFractionDigits: 2 })}
                       </React.Fragment>
                     }
                   </Typography>

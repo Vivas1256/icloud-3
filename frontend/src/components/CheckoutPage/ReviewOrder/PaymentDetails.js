@@ -50,7 +50,7 @@ function PaymentDetails(props) {
             <Typography gutterBottom>Total:</Typography>
           </Grid>
           <Grid item xs={6}>
-            <Typography gutterBottom>R${price.toLocaleString('pt-br', {minimumFractionDigits: 2})}</Typography>
+            <Typography gutterBottom>R${price.toLocaleString('en-us', {minimumFractionDigits: 2})}</Typography>
           </Grid>
         </React.Fragment>
       </Grid>

@@ -434,11 +434,11 @@ transferTicketModal: {
   mainDrawer: {
     listItems: {
       dashboard: "Tablero",
-      connections: "Conexiones",
+      connections: "Chats",
       tickets: "Tickets",
       quickMessages: "Respuestas Rápidas",
       contacts: "Contactos",
-      queues: "Colas y Chatbot",
+      queues: "Dependencias y Chatbot",
       tags: "Etiquetas",
       administration: "Administración",
       users: "Usuarios",
@@ -449,7 +449,7 @@ transferTicketModal: {
       campaigns: "Campañas",
       annoucements: "Anuncios",
       chats: "Chat Interno",
-      financeiro: "Financiero",
+      financeiro: "Mi Plan Activo",
       files: "Lista de archivos",
       prompts: "Open.Ai",
       queueIntegration: "Integraciones",

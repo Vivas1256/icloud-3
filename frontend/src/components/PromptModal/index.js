@@ -226,49 +226,49 @@ const PromptModal = ({ open, onClose, promptId }) => {
                                             <MenuItem key={"texto"} value={"texto"}>
                                                 Texto
                                             </MenuItem>
-                                            <MenuItem key={"en-us-FranciscaNeural"} value={"en-us-FranciscaNeural"}>
+                                            <MenuItem key={"pt-BR-FranciscaNeural"} value={"pt-BR-FranciscaNeural"}>
                                                 Francisa
                                             </MenuItem>
-                                            <MenuItem key={"en-us-AntonioNeural"} value={"en-us-AntonioNeural"}>
+                                            <MenuItem key={"pt-BR-AntonioNeural"} value={"pt-BR-AntonioNeural"}>
                                                 Antônio
                                             </MenuItem>
-                                            <MenuItem key={"en-us-BrendaNeural"} value={"en-us-BrendaNeural"}>
+                                            <MenuItem key={"pt-BR-BrendaNeural"} value={"pt-BR-BrendaNeural"}>
                                                 Brenda
                                             </MenuItem>
-                                            <MenuItem key={"en-us-DonatoNeural"} value={"en-us-DonatoNeural"}>
+                                            <MenuItem key={"pt-BR-DonatoNeural"} value={"pt-BR-DonatoNeural"}>
                                                 Donato
                                             </MenuItem>
-                                            <MenuItem key={"en-us-ElzaNeural"} value={"en-us-ElzaNeural"}>
+                                            <MenuItem key={"pt-BR-ElzaNeural"} value={"pt-BR-ElzaNeural"}>
                                                 Elza
                                             </MenuItem>
-                                            <MenuItem key={"en-us-FabioNeural"} value={"en-us-FabioNeural"}>
+                                            <MenuItem key={"pt-BR-FabioNeural"} value={"pt-BR-FabioNeural"}>
                                                 Fábio
                                             </MenuItem>
-                                            <MenuItem key={"en-us-GiovannaNeural"} value={"en-us-GiovannaNeural"}>
+                                            <MenuItem key={"pt-BR-GiovannaNeural"} value={"pt-BR-GiovannaNeural"}>
                                                 Giovanna
                                             </MenuItem>
-                                            <MenuItem key={"en-us-HumbertoNeural"} value={"en-us-HumbertoNeural"}>
+                                            <MenuItem key={"pt-BR-HumbertoNeural"} value={"pt-BR-HumbertoNeural"}>
                                                 Humberto
                                             </MenuItem>
-                                            <MenuItem key={"en-us-JulioNeural"} value={"en-us-JulioNeural"}>
+                                            <MenuItem key={"pt-BR-JulioNeural"} value={"pt-BR-JulioNeural"}>
                                                 Julio
                                             </MenuItem>
-                                            <MenuItem key={"en-us-LeilaNeural"} value={"en-us-LeilaNeural"}>
+                                            <MenuItem key={"pt-BR-LeilaNeural"} value={"pt-BR-LeilaNeural"}>
                                                 Leila
                                             </MenuItem>
-                                            <MenuItem key={"en-us-LeticiaNeural"} value={"en-us-LeticiaNeural"}>
+                                            <MenuItem key={"pt-BR-LeticiaNeural"} value={"pt-BR-LeticiaNeural"}>
                                                 Letícia
                                             </MenuItem>
-                                            <MenuItem key={"en-us-ManuelaNeural"} value={"en-us-ManuelaNeural"}>
+                                            <MenuItem key={"pt-BR-ManuelaNeural"} value={"pt-BR-ManuelaNeural"}>
                                                 Manuela
                                             </MenuItem>
-                                            <MenuItem key={"en-us-NicolauNeural"} value={"en-us-NicolauNeural"}>
+                                            <MenuItem key={"pt-BR-NicolauNeural"} value={"pt-BR-NicolauNeural"}>
                                                 Nicolau
                                             </MenuItem>
-                                            <MenuItem key={"en-us-ValerioNeural"} value={"en-us-ValerioNeural"}>
+                                            <MenuItem key={"pt-BR-ValerioNeural"} value={"pt-BR-ValerioNeural"}>
                                                 Valério
                                             </MenuItem>
-                                            <MenuItem key={"en-us-YaraNeural"} value={"en-us-YaraNeural"}>
+                                            <MenuItem key={"pt-BR-YaraNeural"} value={"pt-BR-YaraNeural"}>
                                                 Yara
                                             </MenuItem>
                                         </Select>

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import "react-toastify/dist/ReactToastify.css";
 import { QueryClient, QueryClientProvider } from "react-query";
 
-import { es } from "@material-ui/core/locale";
+import { ptBR } from "@material-ui/core/locale";
 import { createTheme, ThemeProvider } from "@material-ui/core/styles";
 import { useMediaQuery } from "@material-ui/core";
 import ColorModeContext from "./layout/themeContext";
@@ -89,8 +89,8 @@ const App = () => {
         const browserLocale =
             i18nlocale.substring(0, 2) + i18nlocale.substring(3, 5);
 
-        if (browserLocale === "es") {
-            setLocale(es);
+        if (browserLocale === "ptBR") {
+            setLocale(ptBR);
         }
     }, []);
 

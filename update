@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "Updating Whaticket, please wait."
+echo "Actualizando Elevara CRM, por favor espere."
 
 git pull
 cd backend
@@ -14,4 +14,4 @@ rm -rf build
 npm run build
 pm2 restart all
 
-echo "Update finalizado. vamos pra cima!"
+echo "Actualización completada, Disfruta"

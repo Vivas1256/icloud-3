@@ -119,7 +119,7 @@ export const provider = async (ticket: Ticket, msg: proto.IWebMessageInfo, compa
                         await sleep(2000)
                         await wbot.sendMessage(`${ticket.contact.number}@${ticket.isGroup ? "g.us" : "s.whatsapp.net"}`, textMessage);
                       } catch (error) {
-                        console.log('Não consegui enviar a mensagem!')
+                        console.log('¡No pude enviar el mensaje')
                       }
                     } else {
                       let nome
@@ -250,7 +250,7 @@ export const provider = async (ticket: Ticket, msg: proto.IWebMessageInfo, compa
                         });
 
                       } catch (error) {
-                        console.log('11 Não consegui enviar a mensagem!')
+                        console.log('11 No pude enviar el mensaje!')
                       }
                     }
                   })

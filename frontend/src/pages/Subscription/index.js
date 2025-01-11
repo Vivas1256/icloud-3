@@ -126,7 +126,7 @@ const Contacts = () => {
               onClick={handleOpenContactModal}
               fullWidth
             >
-              Assine Agora!
+              Suscríbete ahora!
             </Button>
           </div>
 

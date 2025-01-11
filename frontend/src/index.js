@@ -11,9 +11,13 @@ console.log("Rendering React app to DOM...");
 // Renderiza la aplicación
 ReactDOM.render(
   <React.StrictMode>
-    <CssBaseline>
-      <App />
-    </CssBaseline>
+    <App />
   </React.StrictMode>,
+  document.getElementById("root")
+);
+
+// Asegúrate de que CssBaseline se aplique globalmente
+ReactDOM.render(
+  <CssBaseline />,
   document.getElementById("root")
 );

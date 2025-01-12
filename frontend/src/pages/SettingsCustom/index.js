@@ -140,7 +140,7 @@ const SettingsCustom = () => {
     try {
       setSchedules(data);
       await updateSchedules({ id: company.id, schedules: data });
-      toast.success("Horários atualizados com sucesso.");
+      toast.success("Horarios actualizados exitosamente.");
     } catch (e) {
       toast.error(e);
     }

@@ -170,7 +170,7 @@ const messages = {
           importTitle: "Importar contatos",
           deleteMessage: "Tem certeza que deseja deletar este contato? Todos os tickets relacionados serão perdidos.",
           deleteAllMessage: "Tem certeza que deseja deletar todos os contatos? Todos os tickets relacionados serão perdidos.",
-          importMessage: "Deseja importar todos os contatos do telefone?",
+          importMessage: "Deseja importar todos os contatos do ?",
         },
 		confirmationModal:{
 			importTitlte: "Importar contatos",

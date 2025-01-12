@@ -145,7 +145,7 @@ export function CompanyForm(props) {
     const data = { ...record };
     if (data.dueDate !== "" && data.dueDate !== null) {
       switch (data.recurrence) {
-        case "MENSAL":
+        case "MENSUAL":
           data.dueDate = moment(data.dueDate)
             .add(1, "month")
             .format("YYYY-MM-DD");
@@ -202,7 +202,7 @@ export function CompanyForm(props) {
               <Grid xs={12} sm={6} md={4} item>
                 <Field
                   as={TextField}
-                  label="Nome"
+                  label="Nombre de la empresa"
                   name="name"
                   variant="outlined"
                   className={classes.fullWidth}
@@ -223,7 +223,7 @@ export function CompanyForm(props) {
               <Grid xs={12} sm={6} md={2} item>
                 <Field
                   as={TextField}
-                  label="Telefone"
+                  label="Numero Whatsapp"
                   name="phone"
                   variant="outlined"
                   className={classes.fullWidth}
@@ -232,11 +232,11 @@ export function CompanyForm(props) {
               </Grid>
               <Grid xs={12} sm={6} md={2} item>
                 <FormControl margin="dense" variant="outlined" fullWidth>
-                  <InputLabel htmlFor="plan-selection">Plano</InputLabel>
+                  <InputLabel htmlFor="plan-selection">Tipo de plan</InputLabel>
                   <Field
                     as={Select}
                     id="plan-selection"
-                    label="Plano"
+                    label="Tipo de Plan"
                     labelId="plan-selection-label"
                     name="planId"
                     margin="dense"
@@ -256,23 +256,23 @@ export function CompanyForm(props) {
                   <Field
                     as={Select}
                     id="status-selection"
-                    label="Status"
+                    label="Estado"
                     labelId="status-selection-label"
                     name="status"
                     margin="dense"
                   >
-                    <MenuItem value={true}>Sim</MenuItem>
-                    <MenuItem value={false}>Não</MenuItem>
+                    <MenuItem value={true}>Activo</MenuItem>
+                    <MenuItem value={false}>Inactivo</MenuItem>
                   </Field>
                 </FormControl>
               </Grid>
               <Grid xs={12} sm={6} md={2} item>
                 <FormControl margin="dense" variant="outlined" fullWidth>
-                  <InputLabel htmlFor="status-selection">Campanhas</InputLabel>
+                  <InputLabel htmlFor="status-selection">Campañas</InputLabel>
                   <Field
                     as={Select}
                     id="campaigns-selection"
-                    label="Campanhas"
+                    label="Campañas"
                     labelId="campaigns-selection-label"
                     name="campaignsEnabled"
                     margin="dense"
@@ -286,7 +286,7 @@ export function CompanyForm(props) {
                 <FormControl variant="outlined" fullWidth>
                   <Field
                     as={TextField}
-                    label="Data de Vencimento"
+                    label="Fecha de Vencimento"
                     type="date"
                     name="dueDate"
                     InputLabelProps={{
@@ -301,21 +301,21 @@ export function CompanyForm(props) {
               <Grid xs={12} sm={6} md={2} item>
                 <FormControl margin="dense" variant="outlined" fullWidth>
                   <InputLabel htmlFor="recorrencia-selection">
-                    Recorrência
+                    Fecha de corte
                   </InputLabel>
                   <Field
                     as={Select}
-                    label="Recorrência"
+                    label="Fecha de corte"
                     labelId="recorrencia-selection-label"
                     id="recurrence"
                     name="recurrence"
                     margin="dense"
                   >
-                    <MenuItem value="MENSAL">Mensal</MenuItem>
-                    {/*<MenuItem value="BIMESTRAL">Bimestral</MenuItem>*/}
-                    {/*<MenuItem value="TRIMESTRAL">Trimestral</MenuItem>*/}
-                    {/*<MenuItem value="SEMESTRAL">Semestral</MenuItem>*/}
-                    {/*<MenuItem value="ANUAL">Anual</MenuItem>*/}
+                    <MenuItem value="MENSAL">Mensual</MenuItem>
+                    {<MenuItem value="BIMESTRAL">Bimestral</MenuItem>*/}
+                    {<MenuItem value="TRIMESTRAL">Trimestral</MenuItem>*/}
+                    {<MenuItem value="SEMESTRAL">Semestral</MenuItem>*/}
+                    {<MenuItem value="ANUAL">Anual</MenuItem>*/}
                   </Field>
                 </FormControl>
               </Grid>
@@ -329,7 +329,7 @@ export function CompanyForm(props) {
                       onClick={() => onCancel()}
                       variant="contained"
                     >
-                      Limpar
+                      Borrar todo
                     </ButtonWithSpinner>
                   </Grid>
                   {record.id !== undefined ? (
@@ -343,7 +343,7 @@ export function CompanyForm(props) {
                           variant="contained"
                           color="secondary"
                         >
-                          Excluir
+                          Eliminar
                         </ButtonWithSpinner>
                       </Grid>
                       <Grid xs={6} md={2} item>
@@ -355,7 +355,7 @@ export function CompanyForm(props) {
                           variant="contained"
                           color="primary"
                         >
-                          + Vencimento
+                          Ampliacion Servicio
                         </ButtonWithSpinner>
                       </Grid>
                       <Grid xs={6} md={1} item>
@@ -367,7 +367,7 @@ export function CompanyForm(props) {
                           variant="contained"
                           color="primary"
                         >
-                          Usuário
+                          Usuario
                         </ButtonWithSpinner>
                       </Grid>
                     </>
@@ -381,7 +381,7 @@ export function CompanyForm(props) {
                       variant="contained"
                       color="primary"
                     >
-                      Salvar
+                      Guardar
                     </ButtonWithSpinner>
                   </Grid>
                 </Grid>
@@ -400,7 +400,7 @@ export function CompaniesManagerGrid(props) {
   const { dateToClient } = useDate();
 
   const renderStatus = (row) => {
-    return row.status === false ? "Não" : "Sim";
+    return row.status === false ? "Desabilitado" : "Habilitado";
   };
 
   const renderPlan = (row) => {
@@ -453,12 +453,12 @@ export function CompaniesManagerGrid(props) {
             </TableCell>
             <TableCell align="left">Nome</TableCell>
             <TableCell align="left">E-mail</TableCell>
-            <TableCell align="left">Telefone</TableCell>
-            <TableCell align="left">Plano</TableCell>
-            <TableCell align="left">Campanhas</TableCell>
-            <TableCell align="left">Status</TableCell>
-            <TableCell align="left">Criada Em</TableCell>
-            <TableCell align="left">Vencimento</TableCell>
+            <TableCell align="left">Numero Whatsapp</TableCell>
+            <TableCell align="left">Tipo de Plan</TableCell>
+            <TableCell align="left">Campañas</TableCell>
+            <TableCell align="left">Estado</TableCell>
+            <TableCell align="left">Fecha de Creacion</TableCell>
+            <TableCell align="left">Fecha de Vencimiento</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -518,7 +518,7 @@ export default function CompaniesManager() {
       const companyList = await list();
       setRecords(companyList);
     } catch (e) {
-      toast.error("Não foi possível carregar a lista de registros");
+      toast.error("No se puede cargar la lista de registros");
     }
     setLoading(false);
   };
@@ -533,10 +533,10 @@ export default function CompaniesManager() {
       }
       await loadPlans();
       handleCancel();
-      toast.success("Operação realizada com sucesso!");
+      toast.success("Operación completada con éxito!");
     } catch (e) {
       toast.error(
-        "Não foi possível realizar a operação. Verifique se já existe uma empresa com o mesmo nome ou se os campos foram preenchidos corretamente"
+        "No se pudo realizar la operación. Comprueba si ya existe una empresa con el mismo nombre o si los campos se han rellenado correctamente"
       );
     }
     setLoading(false);
@@ -548,9 +548,9 @@ export default function CompaniesManager() {
       await remove(record.id);
       await loadPlans();
       handleCancel();
-      toast.success("Operação realizada com sucesso!");
+      toast.success("Operación completada con éxito!");
     } catch (e) {
-      toast.error("Não foi possível realizar a operação");
+      toast.error("No se puede realizar la operación");
     }
     setLoading(false);
   };
@@ -615,12 +615,12 @@ export default function CompaniesManager() {
         </Grid>
       </Grid>
       <ConfirmationModal
-        title="Exclusão de Registro"
+        title="Eliminación de Empresa"
         open={showConfirmDialog}
         onClose={() => setShowConfirmDialog(false)}
         onConfirm={() => handleDelete()}
       >
-        Deseja realmente excluir esse registro?
+        ¿Realmente desea eliminar esta Empresa?
       </ConfirmationModal>
     </Paper>
   );

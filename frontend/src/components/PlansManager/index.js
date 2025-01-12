@@ -148,7 +148,7 @@ export function PlanManagerForm(props) {
                         <Grid xs={12} sm={6} md={1} item>
                             <Field
                                 as={TextField}
-                                label="Filas"
+                                label="Dependencias"
                                 name="queues"
                                 variant="outlined"
                                 className={classes.fullWidth}
@@ -161,7 +161,7 @@ export function PlanManagerForm(props) {
                         <Grid xs={12} sm={6} md={1} item>
                             <Field
                                 as={TextField}
-                                label="Valor"
+                                label="Valor USD"
                                 name="value"
                                 variant="outlined"
                                 className={classes.fullWidth}
@@ -209,7 +209,7 @@ export function PlanManagerForm(props) {
                         {/* CHAT INTERNO */}
                         <Grid xs={12} sm={8} md={2} item>
                             <FormControl margin="dense" variant="outlined" fullWidth>
-                                <InputLabel htmlFor="useInternalChat-selection">Chat Interno</InputLabel>
+                                <InputLabel htmlFor="useInternalChat-selection">Chat Agentes Interno</InputLabel>
                                 <Field
                                     as={Select}
                                     id="useInternalChat-selection"
@@ -281,11 +281,11 @@ export function PlanManagerForm(props) {
                         {/* INTEGRACOES */}
                         <Grid xs={12} sm={8} md={2} item>
                             <FormControl margin="dense" variant="outlined" fullWidth>
-                                <InputLabel htmlFor="useIntegrations-selection">Integrações</InputLabel>
+                                <InputLabel htmlFor="useIntegrations-selection">Integraciones</InputLabel>
                                 <Field
                                     as={Select}
                                     id="useIntegrations-selection"
-                                    label="Integrações"
+                                    label="Integraciones"
                                     labelId="useIntegrations-selection-label"
                                     name="useIntegrations"
                                     margin="dense"
@@ -298,17 +298,17 @@ export function PlanManagerForm(props) {
 
                         <Grid xs={12} sm={6} md={2} item>
                             <FormControl margin="dense" variant="outlined" fullWidth>
-                                <InputLabel htmlFor="useInternal-selection">Uso Interno</InputLabel>
+                                <InputLabel htmlFor="useInternal-selection">Uso SuperAdmin</InputLabel>
                                 <Field
                                     as={Select}
                                     id="useInternal-selection"
-                                    label="Uso Interno"
+                                    label="Uso SuperAdmin"
                                     labelId="useInternal-selection-label"
                                     name="useInternal"
                                     margin="dense"
                                 >
-                                    <MenuItem value={false}>Sim</MenuItem>
-                                    <MenuItem value={true}>Não</MenuItem>
+                                    <MenuItem value={false}>Si</MenuItem>
+                                    <MenuItem value={true}>No</MenuItem>
                                 </Field>
                             </FormControl>
                         </Grid>
@@ -373,7 +373,7 @@ export function PlansManagerGrid(props) {
     };
 
     const renderInternal = (row) => {
-        return row.useInternal === false ? "Sim" : "Não";
+        return row.useInternal === false ? "Si" : "No";
     };
 
     return (
@@ -390,16 +390,16 @@ export function PlansManagerGrid(props) {
                         <TableCell align="left">{i18n.t("plans.form.name")}</TableCell>
                         <TableCell align="center">{i18n.t("plans.form.users")}</TableCell>
                         <TableCell align="center">{i18n.t("plans.form.connections")}</TableCell>
-                        <TableCell align="center">Filas</TableCell>
-                        <TableCell align="center">Valor</TableCell>
+                        <TableCell align="center">Dependencias</TableCell>
+                        <TableCell align="center">Valor USD</TableCell>
                         <TableCell align="center">{i18n.t("plans.form.campaigns")}</TableCell>
                         <TableCell align="center">{i18n.t("plans.form.schedules")}</TableCell>
-                        <TableCell align="center">Chat Interno</TableCell>
+                        <TableCell align="center">Chat Agentes Interno</TableCell>
                         <TableCell align="center">API Externa</TableCell>
                         <TableCell align="center">Kanban</TableCell>
                         <TableCell align="center">Open.Ai</TableCell>
-                        <TableCell align="center">Integrações</TableCell>
-						<TableCell align="center">Plano Interno</TableCell>
+                        <TableCell align="center">Integraciones</TableCell>
+						<TableCell align="center">Uso SuperAdmin</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -468,7 +468,7 @@ export default function PlansManager() {
             const planList = await list()
             setRecords(planList)
         } catch (e) {
-            toast.error('Não foi possível carregar a lista de registros')
+            toast.error('No se puede cargar la lista de registros')
         }
         setLoading(false)
     }
@@ -484,9 +484,9 @@ export default function PlansManager() {
             }
             await loadPlans()
             handleCancel()
-            toast.success('Operação realizada com sucesso!')
+            toast.success('Operación completada con éxito!')
         } catch (e) {
-            toast.error('Não foi possível realizar a operação. Verifique se já existe uma plano com o mesmo nome ou se os campos foram preenchidos corretamente')
+            toast.error('No se pudo realizar la operación. Comprueba si ya existe un plan con el mismo nombre o si los campos se han rellenado correctamente.')
         }
         setLoading(false)
     }
@@ -497,9 +497,9 @@ export default function PlansManager() {
             await remove(record.id)
             await loadPlans()
             handleCancel()
-            toast.success('Operação realizada com sucesso!')
+            toast.success('Operación completada con éxito!')
         } catch (e) {
-            toast.error('Não foi possível realizar a operação')
+            toast.error('No se puede realizar la operación')
         }
         setLoading(false)
     }
@@ -544,7 +544,7 @@ export default function PlansManager() {
             users: data.users || 0,
             connections: data.connections || 0,
             queues: data.queues || 0,
-            value: data.value?.toLocaleString('pt-br', { minimumFractionDigits: 0 }) || 0,
+            value: data.value?.toLocaleString('en-US', { minimumFractionDigits: 0 }) || 0,
             useCampaigns,
             useSchedules,
             useInternalChat,
@@ -576,12 +576,12 @@ export default function PlansManager() {
                 </Grid>
             </Grid>
             <ConfirmationModal
-                title="Exclusão de Registro"
+                title="Eliminación de >Empresa"
                 open={showConfirmDialog}
                 onClose={() => setShowConfirmDialog(false)}
                 onConfirm={() => handleDelete()}
             >
-                Deseja realmente excluir esse registro?
+                ¿Realmente desea eliminar esta empresa?
             </ConfirmationModal>
         </Paper>
     )

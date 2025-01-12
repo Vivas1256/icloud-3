@@ -48,7 +48,7 @@ const VCardPreview = ({ contact, numbers }) => {
                     padding: "20px",
                     outline: "none",
                 }}>
-                    <h2>Selecione a Fila</h2>
+                    <h2>Seleccione una dependencia</h2>
                     {user.queues.map((queue) => (
                         <div key={queue.id}>
                             <Button onClick={() => handleQueueSelection(queue.id)}>

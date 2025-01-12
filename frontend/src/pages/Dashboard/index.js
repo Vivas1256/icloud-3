@@ -403,7 +403,7 @@ const Dashboard = () => {
               <MenuItem value={60}>Últimos 60 dias</MenuItem>
               <MenuItem value={90}>Últimos 90 dias</MenuItem>
             </Select>
-            <FormHelperText>Selecione las fechas deseadas</FormHelperText>
+            <FormHelperText>Seleccione las fechas deseadas</FormHelperText>
           </FormControl>
         </Grid>
       );
@@ -427,7 +427,7 @@ const Dashboard = () => {
                 <MenuItem value={1}>Filtro por Fecha</MenuItem>
                 <MenuItem value={2}>Filtro por Período</MenuItem>
               </Select>
-              <FormHelperText>Selecione las fechas deseadas</FormHelperText>
+              <FormHelperText>Seleccione las fechas deseadas</FormHelperText>
             </FormControl>
           </Grid>
 

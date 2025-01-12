@@ -87,7 +87,7 @@ export function ChatModal({
       }
 
       if (!users || users.length === 0) {
-        alert("Por favor, selecione pelo menos um usuário.");
+        alert("Por favor seleccione al menos un usuario.");
         return;
       }
 

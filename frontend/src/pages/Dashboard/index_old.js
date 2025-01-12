@@ -235,7 +235,7 @@ const Dashboard = () => {
               <MenuItem value={60}>Últimos 60 dias</MenuItem>
               <MenuItem value={90}>Últimos 90 dias</MenuItem>
             </Select>
-            <FormHelperText>Selecione o período desejado</FormHelperText>
+            <FormHelperText>Seleccione el periodo deseado</FormHelperText>
           </FormControl>
         </Grid>
       );
@@ -249,7 +249,7 @@ const Dashboard = () => {
           <Grid item xs={12} sm={6} md={3}>
             <CardCounter
               icon={<TodayIcon fontSize="inherit" />}
-              title="Data Vencimento"
+              title="Fecha de vencimiento"
               value={companyDueDate}
               loading={loading}
             />
@@ -267,10 +267,10 @@ const Dashboard = () => {
                 value={filterType}
                 onChange={(e) => handleChangeFilterType(e.target.value)}
               >
-                <MenuItem value={1}>Filtro por Data</MenuItem>
+                <MenuItem value={1}>Filtro por Fecha</MenuItem>
                 <MenuItem value={2}>Filtro por Período</MenuItem>
               </Select>
-              <FormHelperText>Selecione o período desejado</FormHelperText>
+              <FormHelperText>Seleccione el periodo deseado</FormHelperText>
             </FormControl>
           </Grid>
 

@@ -375,7 +375,7 @@ function getDateLastMessage(contact) {
                 {i18n.t("contacts.table.email")}
               </TableCell>
               <TableCell align="center">
-              {"Última Interação"}
+              {"Última interacción"}
               </TableCell>
 			  <TableCell align="center">{"Status"}</TableCell>
               <TableCell align="center">

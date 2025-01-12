@@ -458,7 +458,7 @@ export default function Options(props) {
       <Grid spacing={3} container>
         <Grid xs={12} sm={12} md={12} item>
           <FormControl className={classes.selectContainer}>
-            <InputLabel id="ratings-label">Avaliações</InputLabel>
+            <InputLabel id="ratings-label">Reseñas de Clientes</InputLabel>
             <Select
               labelId="ratings-label"
               value={userRating}
@@ -518,7 +518,7 @@ export default function Options(props) {
         <Grid xs={12} sm={12} md={12} item>
           <FormControl className={classes.selectContainer}>
             <InputLabel id="call-type-label">
-            Aceptar llamada
+            Aceptar llamadas de Whatsapp, sonara pero debes contestar desde el celular.
             </InputLabel>
             <Select
               labelId="call-type-label"
@@ -636,7 +636,7 @@ export default function Options(props) {
 						  marginTop: 20,
 						}}
 					  >
-						<Tab label='Configuración global' />
+						<Tab label='Configuración Registro Demo' />
 					  </Tabs>
 					</Grid>
 

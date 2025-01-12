@@ -309,7 +309,7 @@ const Dashboard = () => {
     }
 
     if (Object.keys(params).length === 0) {
-      toast.error("Parametrize o filtro");
+      toast.error("Parametrizar el filtro");
       setLoading(false);
       return;
     }
@@ -360,7 +360,7 @@ const Dashboard = () => {
         <>
           <Grid item xs={12} sm={6} md={4}>
             <TextField
-              label="Data Inicial"
+              label="Fecha Inicial"
               type="date"
               value={dateFrom}
               onChange={(e) => setDateFrom(e.target.value)}
@@ -372,7 +372,7 @@ const Dashboard = () => {
           </Grid>
           <Grid item xs={12} sm={6} md={4}>
             <TextField
-              label="Data Final"
+              label="Fecha Final"
               type="date"
               value={dateTo}
               onChange={(e) => setDateTo(e.target.value)}
@@ -395,7 +395,7 @@ const Dashboard = () => {
               value={period}
               onChange={(e) => handleChangePeriod(e.target.value)}
             >
-              <MenuItem value={0}>Nenhum selecionado</MenuItem>
+              <MenuItem value={0}>Ninguno seleccionado</MenuItem>
               <MenuItem value={3}>Últimos 3 dias</MenuItem>
               <MenuItem value={7}>Últimos 7 dias</MenuItem>
               <MenuItem value={15}>Últimos 15 dias</MenuItem>
@@ -403,7 +403,7 @@ const Dashboard = () => {
               <MenuItem value={60}>Últimos 60 dias</MenuItem>
               <MenuItem value={90}>Últimos 90 dias</MenuItem>
             </Select>
-            <FormHelperText>Selecione o período desejado</FormHelperText>
+            <FormHelperText>Selecione las fechas deseadas</FormHelperText>
           </FormControl>
         </Grid>
       );
@@ -424,10 +424,10 @@ const Dashboard = () => {
                 value={filterType}
                 onChange={(e) => handleChangeFilterType(e.target.value)}
               >
-                <MenuItem value={1}>Filtro por Data</MenuItem>
+                <MenuItem value={1}>Filtro por Fecha</MenuItem>
                 <MenuItem value={2}>Filtro por Período</MenuItem>
               </Select>
-              <FormHelperText>Selecione o período desejado</FormHelperText>
+              <FormHelperText>Selecione las fechas deseadas</FormHelperText>
             </FormControl>
           </Grid>
 
@@ -460,7 +460,7 @@ const Dashboard = () => {
                     variant="h6"
                     paragraph
                   >
-                    Conexões Ativas
+                    Conexiones Ativas
                   </Typography>
                   <Grid item>
                     <Typography
@@ -538,7 +538,7 @@ const Dashboard = () => {
                     variant="h6"
                     paragraph
                   >
-                    Em Conversa
+                    Chats en Conversacion
                   </Typography>
                   <Grid item>
                     <Typography
@@ -575,7 +575,7 @@ const Dashboard = () => {
                     variant="h6"
                     paragraph
                   >
-                    Aguardando
+                    Chats en Espera
                   </Typography>
                   <Grid item>
                     <Typography
@@ -654,7 +654,7 @@ const Dashboard = () => {
                     variant="h6"
                     paragraph
                   >
-                    Finalizados
+                    Chats Finalizados o Cerrados
                   </Typography>
                   <Grid item>
                     <Typography
@@ -691,7 +691,7 @@ const Dashboard = () => {
                     variant="h6"
                     paragraph
                   >
-                    Novos Contatos
+                    Nuevos Contactos
                   </Typography>
                   <Grid item>
                     <Typography
@@ -729,7 +729,7 @@ const Dashboard = () => {
                     variant="h6"
                     paragraph
                   >
-                    T.M. de Conversa
+                    T.M. de Conversacion
                   </Typography>
                   <Grid item>
                     <Typography
@@ -766,7 +766,7 @@ const Dashboard = () => {
                     variant="h6"
                     paragraph
                   >
-                    T.M. de Espera
+                    T.M. de Espera Del Chat
                   </Typography>
                   <Grid item>
                     <Typography

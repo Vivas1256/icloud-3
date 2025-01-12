@@ -458,7 +458,7 @@ export default function Options(props) {
       <Grid spacing={3} container>
         <Grid xs={12} sm={12} md={12} item>
           <FormControl className={classes.selectContainer}>
-            <InputLabel id="ratings-label">Reseñas de Clientes</InputLabel>
+            <InputLabel id="ratings-label">Calificacion de Usuarios</InputLabel>
             <Select
               labelId="ratings-label"
               value={userRating}

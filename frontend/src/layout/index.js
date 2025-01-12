@@ -398,7 +398,7 @@ const LoggedInLayout = ({ children, themeToggle }) => {
               </>
             ) : (
               <>
-                hola, <b>{user.name}</b>, Gracias por colaborar con <b>{user?.company?.name}</b>!
+                Hola, <b>{user.name}</b>, Gracias por colaborar con <b>{user?.company?.name}</b>!
               </>
             )}
           </Typography>

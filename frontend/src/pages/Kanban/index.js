@@ -84,7 +84,7 @@ const Kanban = () => {
     const lanes = [
       {
         id: "lane0",
-        title: i18n.t("Em aberto"),
+        title: i18n.t("Primer contacto"),
         label: "0",
         cards: filteredTickets.map(ticket => ({
           id: ticket.id.toString(),
@@ -167,7 +167,7 @@ const Kanban = () => {
           await api.delete(`/ticket-tags/${targetLaneId}`);
         toast.success('Ticket Tag Removido!');
           await api.put(`/ticket-tags/${targetLaneId}/${sourceLaneId}`);
-        toast.success('Ticket Tag Adicionado com Sucesso!');
+        toast.success('Etiqueta de ticket agregada exitosamente!');
 
     } catch (err) {
       console.log(err);

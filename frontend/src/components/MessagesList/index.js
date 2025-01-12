@@ -631,11 +631,11 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
         return (
           <center>
             <div className={classes.ticketNunberClosed}>
-              Conversa encerrada: {format(parseISO(messagesList[index - 1].createdAt), "dd/MM/yyyy HH:mm:ss")}
+            Conversación cerrada: {format(parseISO(messagesList[index - 1].createdAt), "dd/MM/yyyy HH:mm:ss")}
             </div>
 
             <div className={classes.ticketNunberOpen}>
-              Conversa iniciada: {format(parseISO(message.createdAt), "dd/MM/yyyy HH:mm:ss")}
+            Conversación iniciada: {format(parseISO(message.createdAt), "dd/MM/yyyy HH:mm:ss")}
             </div>
           </center>
         );
@@ -782,7 +782,7 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
                 {message.isDeleted && (
                   <div>
                     <span className={"message-deleted"}
-                    >Essa mensagem foi apagada pelo contato &nbsp;
+                    >Este mensaje fue eliminado por el contacto &nbsp;
                       <Block
                         color="error"
                         fontSize="small"

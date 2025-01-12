@@ -175,7 +175,7 @@ const SignUp = () => {
 											{...field}
 											variant="outlined"
 											fullWidth
-											label="DDD988888888"
+											label="Indicativo pais y numero de Whatsapp"
 											inputProps={{ maxLength: 11 }} // Definindo o limite de caracteres
 										/>
 									)}
@@ -209,7 +209,7 @@ const SignUp = () => {
 									>
 										{plans.map((plan, key) => (
 											<MenuItem key={key} value={plan.id}>
-												{plan.name} - Atendentes: {plan.users} - WhatsApp: {plan.connections} - Filas: {plan.queues} - US {plan.value}
+												{plan.name} - Usuarios: {plan.users} - WhatsApp: {plan.connections} - Dependencias: {plan.queues} - US {plan.value}
 											</MenuItem>
 										))}
 									</Field>

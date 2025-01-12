@@ -267,7 +267,7 @@ const SignUp = () => {
 										</MenuItem>
 										{plans.map((plan, key) => (
 											<MenuItem key={key} value={plan.id}>
-										        {plan.name} - {plan.connections} WhatsApps - {plan.users} Usuários - USD {plan.value.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+										        {plan.name} - {plan.connections} WhatsApps - {plan.users} Usuarios - USD {plan.value.toLocaleString('en-US', { minimumFractionDigits: 2 })}
 											</MenuItem>
 										))}
 									</Field>

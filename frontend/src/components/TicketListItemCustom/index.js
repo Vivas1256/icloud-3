@@ -476,7 +476,7 @@ const useStyles = makeStyles((theme) => ({
           <Box className={classes.ticketInfo1}>{renderTicketInfo()}</Box>
         </ListItemSecondaryAction>
                 {profile === "admin" && (
-                  <Tooltip title="Espiar Conversa">
+                  <Tooltip title="Espiar Conversacion">
                     <VisibilityIcon
                       onClick={() => setOpenTicketMessageDialog(true)}
                       fontSize="small"

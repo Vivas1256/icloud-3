@@ -180,7 +180,7 @@ const EditMessageModal = ({ open, onClose, onSave, message }) => {
        <IconButton edge="start" color="inherit" onClick={() => onClose(false)} aria-label="close">
           <CloseIcon />
         </IconButton>
-        Editar Mensagem
+        Editar Mensaje
         </DialogTitle>
       <DialogContent style={{ padding: "0px"}}>
         <Box>

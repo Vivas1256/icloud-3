@@ -343,7 +343,7 @@ const Connections = () => {
             					color="primary"
             					onClick={restartWhatsapps}
           					>
-            					{i18n.t("REINICIAR CONEXÕES")}
+            					{i18n.t("RESTABLECER CONEXIONES")}
           					</Button>
 							</>
 						)}

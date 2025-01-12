@@ -219,10 +219,10 @@ const Announcements = () => {
       return "Alta";
     }
     if (val === 2) {
-      return "Média";
+      return "Media";
     }
     if (val === 3) {
-      return "Baixa";
+      return "Baja";
     }
   };
 

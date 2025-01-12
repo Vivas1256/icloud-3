@@ -31,7 +31,7 @@ const messages = {
       plans: {
         form: {
           name: "Nombre",
-          users: "Usuários",
+          users: "Usuarios",
           connections: "Conexiones",
           campaigns: "Campañas",
           schedules: "Programaciones",
@@ -785,10 +785,10 @@ const messages = {
         inputLabel: "Dependencias",
       },
       users: {
-        title: "Usuários",
+        title: "Usuarios",
         table: {
 		  id: "ID",
-          name: "Nombree",
+          name: "Nombre",
           email: "Email",
           profile: "Perfil",
           actions: "Acciones",

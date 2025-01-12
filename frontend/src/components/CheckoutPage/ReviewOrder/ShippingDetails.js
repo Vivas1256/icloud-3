@@ -12,12 +12,12 @@ function PaymentDetails(props) {
   return (
     <Grid item xs={12} sm={12}>
       <Typography variant="h6" gutterBottom className={classes.title}>
-        Detalhes do plano
+      Detalles del plan
       </Typography>
-      <Typography gutterBottom>Usuários: {users}</Typography>
+      <Typography gutterBottom>Usuarios: {users}</Typography>
       <Typography gutterBottom>Whatsapps: {connections}</Typography>
       <Typography gutterBottom>Cobrança: Mensal</Typography>
-      <Typography gutterBottom>Total: US{price.toLocaleString('pt-br', {minimumFractionDigits: 2})}</Typography>
+      <Typography gutterBottom>Total: USD{price.toLocaleString('en-US', {minimumFractionDigits: 2})}</Typography>
     </Grid>
   );
 }

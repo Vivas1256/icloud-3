@@ -76,7 +76,7 @@ const CampaignSchema = Yup.object().shape({
   name: Yup.string()
     .min(2, "Too Short!")
     .max(50, "Too Long!")
-    .required("Required"),
+    .required("Requerido"),
 });
 
 const CampaignModal = ({

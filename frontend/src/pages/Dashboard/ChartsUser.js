@@ -108,7 +108,7 @@ export const ChatsUser = () => {
     return (
         <>
             <Typography component="h2" variant="h6" color="primary" gutterBottom>
-                Total de Conversaciones por Usuários o Colaboradores
+                Total de Conversaciones por Usuarios o Colaboradores
             </Typography>
 
             <Stack direction={'row'} spacing={2} alignItems={'center'} sx={{ my: 2, }} >

@@ -423,7 +423,7 @@ const MainListItems = (props) => {
                       <ListItemIcon>
                         <SettingsOutlinedIcon />
                       </ListItemIcon>
-                      <ListItemText primary="Configurações" />
+                      <ListItemText primary="Configuraciones" />
                     </ListItem>
                   </List>
                 </Collapse>

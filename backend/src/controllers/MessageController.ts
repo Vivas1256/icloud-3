@@ -113,11 +113,11 @@ export const send = async (req: Request, res: Response): Promise<Response> => {
     const whatsapp = await Whatsapp.findByPk(whatsappId);
 
     if (!whatsapp) {
-      throw new Error("Não foi possível realizar a operação");
+      throw new Error("No se puede realizar la operación");
     }
 
     if (messageData.number === undefined) {
-      throw new Error("O número é obrigatório");
+      throw new Error("El número es obligatorio");
     }
 
     const numberToTest = messageData.number;

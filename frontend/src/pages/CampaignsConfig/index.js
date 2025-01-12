@@ -109,7 +109,7 @@ const CampaignsConfig = () => {
 
   const saveSettings = async () => {
     await api.post("/campaign-settings", { settings });
-    toast.success("Configurações salvas");
+    toast.success("Configuraciones guardadas");
   };
 
   return (
@@ -237,7 +237,7 @@ const CampaignsConfig = () => {
                 color="primary"
                 variant="contained"
               >
-                Salvar Configurações
+                Guardar configuración
               </Button>
             </Grid>
             {showVariablesForm && (

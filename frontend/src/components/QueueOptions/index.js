@@ -153,7 +153,7 @@ export function QueueOptionStepper({ queueId, options, updateOptions }) {
             onChange={(event) => handleOptionChangeTitle(event, index)}
             size="small"
             className={classes.input}
-            placeholder="Título da opção"
+            placeholder="Título de la opción"
           />
                     <div style={{ display: "none" }}>
             <input
@@ -383,7 +383,7 @@ export function QueueOptions({ queueId }) {
     <div className={classes.root}>
       <br />
       <Typography>
-        Opções
+      Opciones
         <Button
           color="primary"
           size="small"

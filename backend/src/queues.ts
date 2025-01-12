@@ -795,7 +795,7 @@ async function handleLoginStatus(job) {
 
 
 async function handleInvoiceCreate() {
-  logger.info("Iniciando geração de boletos");
+  logger.info("Comenzando a generar recibos de pago");
   const job = new CronJob('*/5 * * * * *', async () => {
 
 

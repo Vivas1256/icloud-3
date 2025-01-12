@@ -71,7 +71,7 @@ const messages = {
       connections: {
         title: "Conexões",
         toasts: {
-          deleted: "Conexão com o WhatsApp excluída com sucesso!",
+          deleted: "Conexão com o telefone excluída com sucesso!",
         },
         confirmationModal: {
           deleteTitle: "Deletar",
@@ -81,7 +81,7 @@ const messages = {
             "Tem certeza? Você precisará ler o QR Code novamente.",
         },
         buttons: {
-          add: "Adicionar WhatsApp",
+          add: "Adicionar telefone",
           disconnect: "desconectar",
           tryAgain: "Tentar novamente",
           qrcode: "QR CODE",
@@ -90,7 +90,7 @@ const messages = {
         },
         toolTips: {
           disconnected: {
-            title: "Falha ao iniciar sessão do WhatsApp",
+            title: "Falha ao iniciar sessão do telefone",
             content:
               "Certifique-se de que seu celular esteja conectado à internet e tente novamente, ou solicite um novo QR Code",
           },
@@ -105,7 +105,7 @@ const messages = {
           timeout: {
             title: "A conexão com o celular foi perdida",
             content:
-              "Certifique-se de que seu celular esteja conectado à internet e o WhatsApp esteja aberto, ou clique no botão 'Desconectar' para obter um novo QR Code",
+              "Certifique-se de que seu celular esteja conectado à internet e o telefone esteja aberto, ou clique no botão 'Desconectar' para obter um novo QR Code",
           },
         },
         table: {
@@ -118,10 +118,10 @@ const messages = {
           session: "Sessão",
         },
       },
-      whatsappModal: {
+      telefoneModal: {
         title: {
-          add: "Adicionar WhatsApp",
-          edit: "Editar WhatsApp",
+          add: "Adicionar telefone",
+          edit: "Editar telefone",
         },		
 		 tabs: {
           general: "Geral",
@@ -152,7 +152,7 @@ const messages = {
           okEdit: "Salvar",
           cancel: "Cancelar",
         },
-        success: "WhatsApp salvo com sucesso.",
+        success: "telefone salvo com sucesso.",
       },
       qrCode: {
         message: "Leia o QrCode para iniciar a sessão",
@@ -174,7 +174,7 @@ const messages = {
         },
 		confirmationModal:{
 			importTitlte: "Importar contatos",
-			importMessage: "Esta ação irá importar os contatos salvos na agenda do WhatsApp. Alguns modelos podem não permitir essa funcionalidade ou de acordo com sua configuração de privacidade! Verifique em até 1 hora o resultado.",
+			importMessage: "Esta ação irá importar os contatos salvos na agenda do telefone. Alguns modelos podem não permitir essa funcionalidade ou de acordo com sua configuração de privacidade! Verifique em até 1 hora o resultado.",
 			deleteTitle:"Deletar",
 			deleteMessage:"Tem certeza que deseja deletar este contato? Todos os atendimentos relacionados serão perdidos.",
 		},
@@ -187,7 +187,7 @@ const messages = {
         },
         table: {
           name: "Nome",
-          whatsapp: "WhatsApp",
+          telefone: "telefone",
           email: "Email",
           actions: "Ações",
         },
@@ -281,11 +281,11 @@ const messages = {
           mainInfo: "Dados do contato",
           extraInfo: "Informações adicionais",
           name: "Nome",
-          number: "Número do Whatsapp",
+          number: "Número do telefone",
           email: "Email",
           extraName: "Nome do campo",
           extraValue: "Valor",
-          whatsapp: "Conexão Origem: "
+          telefone: "Conexão Origem: "
         },
         buttons: {
           addExtraInfo: "Adicionar informação",
@@ -331,7 +331,7 @@ const messages = {
           email: "Email",
           password: "Senha",
           profile: "Perfil",
-          whatsapp: "Conexão Padrão",
+          telefone: "Conexão Padrão",
 
           allTicket: "Ticket Sem Fila [Invisível]",
           allTicketEnabled: "Habilitado",
@@ -624,7 +624,7 @@ const messages = {
         dialog: {
           name: "Nome",
           number: "Número",
-          whatsapp: "Whatsapp",
+          telefone: "telefone",
           email: "E-mail",
           okEdit: "Editar",
           okAdd: "Adicionar",
@@ -635,7 +635,7 @@ const messages = {
         table: {
           name: "Nome",
           number: "Número",
-          whatsapp: "Whatsapp",
+          telefone: "telefone",
           email: "E-mail",
           actions: "Ações",
         },
@@ -658,7 +658,7 @@ const messages = {
         },
         table: {
           name: "Nome",
-          whatsapp: "Conexão",
+          telefone: "Conexão",
           contactList: "Lista de Contatos",
           status: "Status",
           scheduledAt: "Agendamento",
@@ -683,7 +683,7 @@ const messages = {
             confirmationMessage4: "Mensagem de Confirmação 4",
             confirmationMessage5: "Mensagem de Confirmação 5",
             messagePlaceholder: "Conteúdo da mensagem",
-            whatsapp: "Conexão",
+            telefone: "Conexão",
             status: "Status",
             scheduledAt: "Agendamento",
             confirmation: "Confirmação",
@@ -946,21 +946,21 @@ const messages = {
         },
       },
       backendErrors: {
-        ERR_NO_OTHER_WHATSAPP: "Deve haver pelo menos um WhatsApp padrão.",
+        ERR_NO_OTHER_telefone: "Deve haver pelo menos um telefone padrão.",
         ERR_NO_DEF_WAPP_FOUND:
-          "Nenhum WhatsApp padrão encontrado. Verifique a página de conexões.",
+          "Nenhum telefone padrão encontrado. Verifique a página de conexões.",
         ERR_WAPP_NOT_INITIALIZED:
-          "Esta sessão do WhatsApp não foi inicializada. Verifique a página de conexões.",
+          "Esta sessão do telefone não foi inicializada. Verifique a página de conexões.",
         ERR_WAPP_CHECK_CONTACT:
-          "Não foi possível verificar o contato do WhatsApp. Verifique a página de conexões",
-        ERR_WAPP_INVALID_CONTACT: "Este não é um número de Whatsapp válido.",
+          "Não foi possível verificar o contato do telefone. Verifique a página de conexões",
+        ERR_WAPP_INVALID_CONTACT: "Este não é um número de telefone válido.",
         ERR_WAPP_DOWNLOAD_MEDIA:
-          "Não foi possível baixar mídia do WhatsApp. Verifique a página de conexões.",
+          "Não foi possível baixar mídia do telefone. Verifique a página de conexões.",
         ERR_INVALID_CREDENTIALS:
           "Erro de autenticação. Por favor, tente novamente.",
         ERR_SENDING_WAPP_MSG:
-          "Erro ao enviar mensagem do WhatsApp. Verifique a página de conexões.",
-        ERR_DELETE_WAPP_MSG: "Não foi possível excluir a mensagem do WhatsApp.",
+          "Erro ao enviar mensagem do telefone. Verifique a página de conexões.",
+        ERR_DELETE_WAPP_MSG: "Não foi possível excluir a mensagem do telefone.",
         ERR_OTHER_OPEN_TICKET: "Já existe um tíquete aberto para este contato.",
         ERR_SESSION_EXPIRED: "Sessão expirada. Por favor entre.",
         ERR_USER_CREATION_DISABLED:
@@ -971,7 +971,7 @@ const messages = {
         ERR_NO_CONTACT_FOUND: "Nenhum contato encontrado com este ID.",
         ERR_NO_TICKET_FOUND: "Nenhum tíquete encontrado com este ID.",
         ERR_NO_USER_FOUND: "Nenhum usuário encontrado com este ID.",
-        ERR_NO_WAPP_FOUND: "Nenhum WhatsApp encontrado com este ID.",
+        ERR_NO_WAPP_FOUND: "Nenhum telefone encontrado com este ID.",
         ERR_CREATING_MESSAGE: "Erro ao criar mensagem no banco de dados.",
         ERR_CREATING_TICKET: "Erro ao criar tíquete no banco de dados.",
         ERR_FETCH_WAPP_MSG:

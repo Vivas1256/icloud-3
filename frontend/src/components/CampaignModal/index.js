@@ -576,11 +576,11 @@ const CampaignModal = ({
                       }}
                     >
                       <Tab label="Msg. 1" index={0} />
-                     {/* <Tab label="Msg. 2" index={1} />
+                      <Tab label="Msg. 2" index={1} />
                       <Tab label="Msg. 3" index={2} />
                       <Tab label="Msg. 4" index={3} />
                       <Tab label="Msg. 5" index={4} />
-                    </Tabs> */}
+                    </Tabs> 
                     <Box style={{ paddingTop: 20, border: "none" }}>
                       {messageTab === 0 && (
                         <>

@@ -106,7 +106,7 @@ const CampaignModal = ({
     confirmationMessage4: "",
     confirmationMessage5: "",
     status: "INACTIVA", // INATIVA, PROGRAMADA, EM_ANDAMENTO, CANCELADA, FINALIZADA,
-    confirmation: false,
+    confirmation: true,
     scheduledAt: "",
     whatsappId: "",
     contactListId: "",
@@ -223,7 +223,7 @@ const CampaignModal = ({
       const dataValues = {};
       Object.entries(values).forEach(([key, value]) => {
         if (key === "scheduledAt" && value !== "" && value !== null) {
-          dataValues[key] = moment(value).format("YYYY-MM-DD HH:mm:ss");
+          dataValues[key] = moment(value).subtract(2, 'hours').format("YYYY-MM-DD HH:mm:ss");
         } else {
           dataValues[key] = value === "" ? null : value;
         }
@@ -283,7 +283,7 @@ const CampaignModal = ({
         placeholder={i18n.t("campaigns.dialog.form.messagePlaceholder")}
         multiline={true}
         variant="outlined"
-        helperText="Utilize variáveis como {nome}, {numero}, {email} ou defina variáveis personalziadas."
+        helperText="Utilice variables como {nombre}, {número}, {correo electrónico} o defina variables personalizadas."
         disabled={!campaignEditable && campaign.status !== "CANCELADA"}
       />
     );
@@ -522,7 +522,7 @@ const CampaignModal = ({
                     <Field
                       as={TextField}
                       label={i18n.t("campaigns.dialog.form.scheduledAt")}
-                      name="scheduledAt"
+                      name="Programado"
                       error={touched.scheduledAt && Boolean(errors.scheduledAt)}
                       helperText={touched.scheduledAt && errors.scheduledAt}
                       variant="outlined"
@@ -553,7 +553,7 @@ const CampaignModal = ({
                         labelId="fileListId-selection-label"
                         value={values.fileListId || ""}
                       >
-                        <MenuItem value={""} >{"Nenhum"}</MenuItem>
+                        <MenuItem value={""} >{"Ninguno"}</MenuItem>
                         {file.map(f => (
                           <MenuItem key={f.id} value={f.id}>
                             {f.name}
@@ -587,7 +587,7 @@ const CampaignModal = ({
                           {values.confirmation ? (
                             <Grid spacing={2} container>
                               <Grid xs={12} md={8} item>
-                                <>{renderMessageField("message1")}</>
+                                <>{renderMessageField("Mensaje1")}</>
                               </Grid>
                               <Grid xs={12} md={4} item>
                                 <>
@@ -598,7 +598,7 @@ const CampaignModal = ({
                               </Grid>
                             </Grid>
                           ) : (
-                            <>{renderMessageField("message1")}</>
+                            <>{renderMessageField("Mensaje1")}</>
                           )}
                         </>
                       )}
@@ -607,7 +607,7 @@ const CampaignModal = ({
                           {values.confirmation ? (
                             <Grid spacing={2} container>
                               <Grid xs={12} md={8} item>
-                                <>{renderMessageField("message2")}</>
+                                <>{renderMessageField("Mensaje2")}</>
                               </Grid>
                               <Grid xs={12} md={4} item>
                                 <>
@@ -618,7 +618,7 @@ const CampaignModal = ({
                               </Grid>
                             </Grid>
                           ) : (
-                            <>{renderMessageField("message2")}</>
+                            <>{renderMessageField("Mensaje2")}</>
                           )}
                         </>
                       )}
@@ -627,7 +627,7 @@ const CampaignModal = ({
                           {values.confirmation ? (
                             <Grid spacing={2} container>
                               <Grid xs={12} md={8} item>
-                                <>{renderMessageField("message3")}</>
+                                <>{renderMessageField("Mensaje3")}</>
                               </Grid>
                               <Grid xs={12} md={4} item>
                                 <>
@@ -638,7 +638,7 @@ const CampaignModal = ({
                               </Grid>
                             </Grid>
                           ) : (
-                            <>{renderMessageField("message3")}</>
+                            <>{renderMessageField("Mensaje3")}</>
                           )}
                         </>
                       )}
@@ -647,7 +647,7 @@ const CampaignModal = ({
                           {values.confirmation ? (
                             <Grid spacing={2} container>
                               <Grid xs={12} md={8} item>
-                                <>{renderMessageField("message4")}</>
+                                <>{renderMessageField("Mensaje4")}</>
                               </Grid>
                               <Grid xs={12} md={4} item>
                                 <>
@@ -658,7 +658,7 @@ const CampaignModal = ({
                               </Grid>
                             </Grid>
                           ) : (
-                            <>{renderMessageField("message4")}</>
+                            <>{renderMessageField("Mensaje4")}</>
                           )}
                         </>
                       )}
@@ -667,7 +667,7 @@ const CampaignModal = ({
                           {values.confirmation ? (
                             <Grid spacing={2} container>
                               <Grid xs={12} md={8} item>
-                                <>{renderMessageField("message5")}</>
+                                <>{renderMessageField("Mensaje5")}</>
                               </Grid>
                               <Grid xs={12} md={4} item>
                                 <>
@@ -678,7 +678,7 @@ const CampaignModal = ({
                               </Grid>
                             </Grid>
                           ) : (
-                            <>{renderMessageField("message5")}</>
+                            <>{renderMessageField("Mensaje5")}</>
                           )}
                         </>
                       )}
@@ -713,7 +713,7 @@ const CampaignModal = ({
                     {i18n.t("campaigns.dialog.buttons.restart")}
                   </Button>
                 )}
-                {campaign.status === "EM_ANDAMENTO" && (
+                {campaign.status === "En Proceso" && (
                   <Button
                     color="primary"
                     onClick={() => cancelCampaign()}
@@ -766,6 +766,32 @@ const CampaignModal = ({
       </Dialog>
     </div>
   );
+};
+
+// Aquí se construye el array de mensajes
+ const messages = [
+  values.message1,
+  values.message2,
+  values.message3,
+  values.message4,
+  values.message5,
+].filter(msg => msg); // Filtra mensajes vacíos
+
+// Envía los mensajes a tu API
+await api.post("/campaigns/send-messages", { messages });
+
+// Luego guarda la campaña
+if (campaignId) {
+  await api.put(`/campaigns/${campaignId}`, dataValues);
+} else {
+  const { data } = await api.post("/campaigns", dataValues);
+}
+
+toast.success(i18n.t("campaigns.toasts.success"));
+} catch (err) {
+console.error("Error saving campaign:", err);
+toast.error(err.response?.data?.message || "Error al guargar campaña");
+}
 };
 
 export default CampaignModal;

@@ -223,7 +223,7 @@ const CampaignModal = ({
       const dataValues = {};
       Object.entries(values).forEach(([key, value]) => {
         if (key === "scheduledAt" && value !== "" && value !== null) {
-          dataValues[key] = moment(value).subtract(2, 'hours').format("YYYY-MM-DD HH:mm:ss");
+          dataValues[key] = moment(value).format("YYYY-MM-DD HH:mm:ss");
         } else {
           dataValues[key] = value === "" ? null : value;
         }

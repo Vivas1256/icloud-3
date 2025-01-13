@@ -355,7 +355,7 @@ const getBodyButton = (msg: proto.IWebMessageInfo): string => {
 const msgLocation = (image, latitude, longitude) => {
   if (image) {
     var b64 = Buffer.from(image).toString("base64");
-    const userLanguage = someCondition ? "es" : "en"; // Ejemplo de asignación condicional
+    const userLanguage = "es";
     let data = `data:image/png;base64, ${b64} | https://maps.google.com/maps?q=${latitude}%2C${longitude}&z=17&hl=${userLanguage}|${latitude}, ${longitude} `;
     return data;
   }

@@ -768,29 +768,42 @@ const CampaignModal = ({
   );
 };
 
-// Aquí se construye el array de mensajes
- const messages = [
-  values.message1,
-  values.message2,
-  values.message3,
-  values.message4,
-  values.message5,
-].filter(msg => msg); // Filtra mensajes vacíos
+const handleSaveCampaign = async (values) => {
+  try {
+    const dataValues = {};
+    Object.entries(values).forEach(([key, value]) => {
+      if (key === "scheduledAt" && value !== "" && value !== null) {
+        // Ajusta la hora restando 2 horas
+        dataValues[key] = moment(value).subtract(2, 'hours').format("YYYY-MM-DD HH:mm:ss");
+      } else {
+        dataValues[key] = value === "" ? null : value;
+      }
+    });
 
-// Envía los mensajes a tu API
-await api.post("/campaigns/send-messages", { messages });
+    // Construir el array de mensajes
+    const messages = [
+      values.message1,
+      values.message2,
+      values.message3,
+      values.message4,
+      values.message5,
+    ].filter(msg => msg); // Filtra mensajes vacíos
 
-// Luego guarda la campaña
-if (campaignId) {
-  await api.put(`/campaigns/${campaignId}`, dataValues);
-} else {
-  const { data } = await api.post("/campaigns", dataValues);
-}
+    // Enviar los mensajes a la API
+    await api.post("/campaigns/send-messages", { messages });
 
-toast.success(i18n.t("campaigns.toasts.success"));
- catch (err) {
-console.error("Error saving campaign:", err);
-toast.error(err.response?.data?.message || "Error al guargar campaña");}
+    // Guardar la campaña
+    if (campaignId) {
+      await api.put(`/campaigns/${campaignId}`, dataValues);
+    } else {
+      const { data } = await api.post("/campaigns", dataValues);
+    }
+
+    toast.success(i18n.t("campaigns.toasts.success"));
+  } catch (err) {
+    console.error("Error saving campaign:", err);
+    toast.error(err.response?.data?.message || "Error al guardar campaña");
+  }
 };
 
 export default CampaignModal;

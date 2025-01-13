@@ -788,10 +788,9 @@ if (campaignId) {
 }
 
 toast.success(i18n.t("campaigns.toasts.success"));
-} catch (err) {
+ catch (err) {
 console.error("Error saving campaign:", err);
-toast.error(err.response?.data?.message || "Error al guargar campaña");
-}
+toast.error(err.response?.data?.message || "Error al guargar campaña");}
 };
 
 export default CampaignModal;

@@ -346,31 +346,31 @@ const Campaigns = () => {
                   <TableCell align="center">
                     {campaign.contactListId
                       ? campaign.contactList.name
-                      : "Não definida"}
+                      : "No definido"}
                   </TableCell>
                   <TableCell align="center">
                     {campaign.whatsappId
                       ? campaign.whatsapp.name
-                      : "Não definido"}
+                      : "No definido"}
                   </TableCell>
                   <TableCell align="center">
                     {campaign.scheduledAt
                       ? datetimeToClient(campaign.scheduledAt)
-                      : "Sem agendamento"}
+                      : "Sin agendamiento"}
                   </TableCell>
                   <TableCell align="center">
                     {campaign.completedAt
                       ? datetimeToClient(campaign.completedAt)
-                      : "Não concluída"}
+                      : "No completado"}
                   </TableCell>
                   {/* <TableCell align="center">
                     {campaign.confirmation ? "Habilitada" : "Desabilitada"}
                   </TableCell> */}
                   <TableCell align="center">
-                    {campaign.status === "EM_ANDAMENTO" && (
+                    {campaign.status === "En Proceso" && (
                       <IconButton
                         onClick={() => cancelCampaign(campaign)}
-                        title="Parar Campanha"
+                        title="Parar Campaña"
                         size="small"
                       >
                         <PauseCircleOutlineIcon />
@@ -379,7 +379,7 @@ const Campaigns = () => {
                     {campaign.status === "CANCELADA" && (
                       <IconButton
                         onClick={() => restartCampaign(campaign)}
-                        title="Parar Campanha"
+                        title="Parar Campaña"
                         size="small"
                       >
                         <PlayCircleOutlineIcon />

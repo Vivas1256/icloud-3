@@ -105,12 +105,12 @@ const CampaignModal = ({
     confirmationMessage3: "",
     confirmationMessage4: "",
     confirmationMessage5: "",
-    status: "INATIVA", // INATIVA, PROGRAMADA, EM_ANDAMENTO, CANCELADA, FINALIZADA,
+    status: "INACTIVA", // INATIVA, PROGRAMADA, EM_ANDAMENTO, CANCELADA, FINALIZADA,
     confirmation: false,
     scheduledAt: "",
     whatsappId: "",
     contactListId: "",
-    tagListId: "Nenhuma",
+    tagListId: "Ninguno",
     companyId,
   };
 
@@ -198,9 +198,9 @@ const CampaignModal = ({
     const now = moment();
     const scheduledAt = moment(campaign.scheduledAt);
     const moreThenAnHour =
-      !Number.isNaN(scheduledAt.diff(now)) && scheduledAt.diff(now, "hour") > 1;
+      !Number.isNaN(scheduledAt.diff(now));
     const isEditable =
-      campaign.status === "INATIVA" ||
+      campaign.status === "INACTIVA" ||
       (campaign.status === "PROGRAMADA" && moreThenAnHour);
 
     setCampaignEditable(isEditable);
@@ -445,7 +445,7 @@ const CampaignModal = ({
                         }
                         disabled={!campaignEditable}
                       >
-                        <MenuItem value="">Nenhuma</MenuItem>
+                        <MenuItem value="">Ninguno</MenuItem>
                         {contactLists &&
                           contactLists.map((contactList) => (
                             <MenuItem
@@ -478,7 +478,7 @@ const CampaignModal = ({
                         error={touched.tagListId && Boolean(errors.tagListId)}
                         disabled={!campaignEditable}
                       >
-                        <MenuItem value="">Nenhuma</MenuItem>
+                        <MenuItem value="">Ninguno</MenuItem>
                         {Array.isArray(tagLists) &&
                           tagLists.map((tagList) => (
                             <MenuItem key={tagList.id} value={tagList.id}>
@@ -508,7 +508,7 @@ const CampaignModal = ({
                         error={touched.whatsappId && Boolean(errors.whatsappId)}
                         disabled={!campaignEditable}
                       >
-                        <MenuItem value="">Nenhuma</MenuItem>
+                        <MenuItem value="">Ninguno</MenuItem>
                         {whatsapps &&
                           whatsapps.map((whatsapp) => (
                             <MenuItem key={whatsapp.id} value={whatsapp.id}>

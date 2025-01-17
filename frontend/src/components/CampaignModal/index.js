@@ -108,6 +108,11 @@ const CampaignModal = ({
     companyId,
   });
 
+  // Definición de estado para listas de contactos y WhatsApp
+  const [contactLists, setContactLists] = useState([]);
+  const [whatsapps, setWhatsapps] = useState([]);
+  const [messageTab, setMessageTab] = useState(0); // Definición de messageTab
+
   useEffect(() => {
     return () => {
       isMounted.current = false;

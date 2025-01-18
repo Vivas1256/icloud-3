@@ -359,6 +359,22 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                       className={classes.textField}
                       disabled={!campaignEditable}
                     />
+                    <InputLabel id="fileListId-selection-label">{i18n.t("campaigns.dialog.form.fileList")}</InputLabel>
+                      <Field
+                        as={Select}
+                        label={i18n.t("campaigns.dialog.form.fileList")}
+                        name="fileListId"
+                        id="fileListId"
+                        placeholder={i18n.t("campaigns.dialog.form.fileList")}
+                        labelId="fileListId-selection-label"
+                        value={values.fileListId || ""}
+                      >
+                        <MenuItem value={""} >{"Ninguno"}</MenuItem>
+                        {file.map(f => (
+                          <MenuItem key={f.id} value={f.id}>
+                            {f.name}
+                          </MenuItem>
+                        ))}
                   </Grid>
                   <Grid xs={12} item>
                     <Tabs
@@ -377,24 +393,76 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                       <Tab label="Msg. 5" index={4} />
                     </Tabs>
                     <Box style={{ paddingTop: 20 }}>
-                      {[...Array(5)].map((_, index) => (
-                        <Grid container spacing={2} key={index}>
-                          <Grid xs={12} md={8} item>
-                            <Field
-                              as={TextField}
-                              id={`message${index + 1}`}
-                              name={`message${index + 1}`}
-                              fullWidth
-                              rows={5}
-                              label={i18n.t(`campaigns.dialog.form.message${index + 1}`)}
-                              placeholder={i18n.t("campaigns.dialog.form.messagePlaceholder")}
-                              multiline={true}
-                              variant="outlined"
-                              disabled={!campaignEditable}
-                            />
-                          </Grid>
-                        </Grid>
-                      ))}
+                      {messageTab === 0 && (
+                        <Field
+                          as={TextField}
+                          id="message1"
+                          name="message1"
+                          fullWidth
+                          rows={5}
+                          label={i18n.t("campaigns.dialog.form.message1")}
+                          placeholder={i18n.t("campaigns.dialog.form.messagePlaceholder")}
+                          multiline={true}
+                          variant="outlined"
+                          disabled={!campaignEditable}
+                        />
+                      )}
+                      {messageTab === 1 && (
+                        <Field
+                          as={TextField}
+                          id="message2"
+                          name="message2"
+                          fullWidth
+                          rows={5}
+                          label={i18n.t("campaigns.dialog.form.message2")}
+                          placeholder={i18n.t("campaigns.dialog.form.messagePlaceholder")}
+                          multiline={true}
+                          variant="outlined"
+                          disabled={!campaignEditable}
+                        />
+                      )}
+                      {messageTab === 2 && (
+                        <Field
+                          as={TextField}
+                          id="message3"
+                          name="message3"
+                          fullWidth
+                          rows={5}
+                          label={i18n.t("campaigns.dialog.form.message3")}
+                          placeholder={i18n.t("campaigns.dialog.form.messagePlaceholder")}
+                          multiline={true}
+                          variant="outlined"
+                          disabled={!campaignEditable}
+                        />
+                      )}
+                      {messageTab === 3 && (
+                        <Field
+                          as={TextField}
+                          id="message4"
+                          name="message4"
+                          fullWidth
+                          rows={5}
+                          label={i18n.t("campaigns.dialog.form.message4")}
+                          placeholder={i18n.t("campaigns.dialog.form.messagePlaceholder")}
+                          multiline={true}
+                          variant="outlined"
+                          disabled={!campaignEditable}
+                        />
+                      )}
+                      {messageTab === 4 && (
+                        <Field
+                          as={TextField}
+                          id="message5"
+                          name="message5"
+                          fullWidth
+                          rows={5}
+                          label={i18n.t("campaigns.dialog.form.message5")}
+                          placeholder={i18n.t("campaigns.dialog.form.messagePlaceholder")}
+                          multiline={true}
+                          variant="outlined"
+                          disabled={!campaignEditable}
+                        />
+                      )}
                     </Box>
                   </Grid>
                 </Grid>

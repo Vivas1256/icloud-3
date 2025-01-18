@@ -21,7 +21,7 @@ import { Box, FormControl, Grid, InputLabel, MenuItem, Select, Tab, Tabs } from 
 import { AuthContext } from "../../context/Auth/AuthContext";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
-import ConfirmationModal from "../ConfirmationModal"; // Asegúrate de que esta ruta sea correcta
+import ConfirmationModal from "../ConfirmationModal";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -47,6 +47,9 @@ const useStyles = makeStyles((theme) => ({
     marginTop: -12,
     marginLeft: -12,
   },
+  formControl: {
+    width: "100%",
+  }
 }));
 
 const CampaignSchema = Yup.object().shape({
@@ -61,6 +64,7 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
   const { user } = useContext(AuthContext);
   const { companyId } = user;
   const [attachment, setAttachment] = useState(null);
+  const [files, setFiles] = useState([]);
   const [campaign, setCampaign] = useState(initialValues || {
     name: "",
     message1: "",
@@ -74,6 +78,7 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
     contactListId: "",
     tagListId: "",
     whatsappId: "",
+    fileListId: "",
   });
   const [whatsapps, setWhatsapps] = useState([]);
   const [contactLists, setContactLists] = useState([]);
@@ -94,6 +99,9 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
 
         const { data: tagData } = await api.get(`/tags`, { params: { companyId } });
         setTagLists(tagData.tags);
+
+        const { data: fileData } = await api.get(`/files`, { params: { companyId } });
+        setFiles(fileData);
       } catch (err) {
         toastError(err);
       }
@@ -109,7 +117,7 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
           const { data } = await api.get(`/campaigns/${campaignId}`);
           setCampaign({
             ...data,
-            scheduledAt: moment(data.scheduledAt).format("YYYY-MM-DDTHH:mm"), // Formato correcto
+            scheduledAt: moment(data.scheduledAt).format("YYYY-MM-DDTHH:mm"),
           });
         } catch (error) {
           console.error("Error fetching campaign data:", error);
@@ -131,6 +139,7 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
         contactListId: "",
         tagListId: "",
         whatsappId: "",
+        fileListId: "",
       });
     }
   }, [campaignId, open, initialValues]);
@@ -150,6 +159,7 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
       contactListId: "",
       tagListId: "",
       whatsappId: "",
+      fileListId: "",
     });
   };
 
@@ -163,13 +173,13 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
   const sendMessages = async (campaignId, messages) => {
     for (let i = 0; i < messages.length; i++) {
       const message = messages[i];
-      if (message) { // Asegúrate de que el mensaje no esté vacío
+      if (message) {
         try {
           await api.post(`/campaigns/${campaignId}/send-message`, { message });
-          await new Promise(resolve => setTimeout(resolve, 1000)); // Espera 1 segundo entre mensajes
+          await new Promise(resolve => setTimeout(resolve, 1000));
         } catch (error) {
           console.error("Error sending message:", error);
-          break; // Detener el envío si hay un error
+          break;
         }
       }
     }
@@ -177,14 +187,13 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
 
   const handleSaveCampaign = async (values) => {
     try {
-      // Sumar 2 horas a la hora programada
       const scheduledAt = values.scheduledAt 
           ? moment(values.scheduledAt).add(2, 'hours').format("YYYY-MM-DD HH:mm:ss") 
           : null;
 
       const dataValues = {
           ...values,
-          scheduledAt: scheduledAt, // Usar la hora ajustada
+          scheduledAt: scheduledAt,
       };
 
       if (campaignId) {
@@ -231,7 +240,7 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
   const deleteMedia = async () => {
     if (attachment) {
       setAttachment(null);
-      attachmentFile.current.value = null; // Limpiar el input de archivo
+      attachmentFile.current.value = null;
     }
 
     if (campaign.mediaPath) {
@@ -252,13 +261,13 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
         title={i18n.t("campaigns.confirmationModal.deleteTitle")}
         open={confirmationOpen}
         onClose={() => setConfirmationOpen(false)}
-        onConfirm={deleteMedia} // Aquí se utiliza la función
+        onConfirm={deleteMedia}
       >
         {i18n.t("campaigns.confirmationModal.deleteMessage")}
       </ConfirmationModal>
       <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md" scroll="paper">
         <DialogTitle id="form-dialog-title">
-          {campaignEditable ? (campaignId ? `${i18n.t("campaigns.dialog.Actualizar")}` : `${i18n.t("campaigns.dialog.new")}`) : <>{`${i18n.t("campaigns.dialog.readonly")}`}</>}
+          {campaignEditable ? (campaignId ? `${i18n.t("campaigns.dialog.update")}` : `${i18n.t("campaigns.dialog.new")}`) : `${i18n.t("campaigns.dialog.readonly")}`}
         </DialogTitle>
         <div style={{ display: "none" }}>
           <input type="file" ref={attachmentFile} onChange={handleAttachmentFile} />
@@ -294,7 +303,9 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                   </Grid>
                   <Grid xs={12} md={4} item>
                     <FormControl variant="outlined" margin="dense" fullWidth>
-                      <InputLabel id="contactList-selection-label">{i18n.t("campaigns.dialog.form.contactList")}</InputLabel>
+                      <InputLabel id="contactList-selection-label">
+                        {i18n.t("campaigns.dialog.form.contactList")}
+                      </InputLabel>
                       <Field
                         as={Select}
                         label={i18n.t("campaigns.dialog.form.contactList")}
@@ -305,14 +316,18 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                       >
                         <MenuItem value="">Ninguno</MenuItem>
                         {contactLists.map(contactList => (
-                          <MenuItem key={contactList.id} value={contactList.id}>{contactList.name}</MenuItem>
+                          <MenuItem key={contactList.id} value={contactList.id}>
+                            {contactList.name}
+                          </MenuItem>
                         ))}
                       </Field>
                     </FormControl>
                   </Grid>
                   <Grid xs={12} md={4} item>
                     <FormControl variant="outlined" margin="dense" fullWidth>
-                      <InputLabel id="tagList-selection-label">{i18n.t("campaigns.dialog.form.tagList")}</InputLabel>
+                      <InputLabel id="tagList-selection-label">
+                        {i18n.t("campaigns.dialog.form.tagList")}
+                      </InputLabel>
                       <Field
                         as={Select}
                         label={i18n.t("campaigns.dialog.form.tagList")}
@@ -323,14 +338,18 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                       >
                         <MenuItem value="">Ninguno</MenuItem>
                         {tagLists.map(tag => (
-                          <MenuItem key={tag.id} value={tag.id}>{tag.name}</MenuItem>
+                          <MenuItem key={tag.id} value={tag.id}>
+                            {tag.name}
+                          </MenuItem>
                         ))}
                       </Field>
                     </FormControl>
                   </Grid>
                   <Grid xs={12} md={4} item>
                     <FormControl variant="outlined" margin="dense" fullWidth>
-                      <InputLabel id="whatsapp-selection-label">{i18n.t("campaigns.dialog.form.whatsapp")}</InputLabel>
+                      <InputLabel id="whatsapp-selection-label">
+                        {i18n.t("campaigns.dialog.form.whatsapp")}
+                      </InputLabel>
                       <Field
                         as={Select}
                         label={i18n.t("campaigns.dialog.form.whatsapp")}
@@ -341,7 +360,9 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                       >
                         <MenuItem value="">Ninguno</MenuItem>
                         {whatsapps.map(whatsapp => (
-                          <MenuItem key={whatsapp.id} value={whatsapp.id}>{whatsapp.name}</MenuItem>
+                          <MenuItem key={whatsapp.id} value={whatsapp.id}>
+                            {whatsapp.name}
+                          </MenuItem>
                         ))}
                       </Field>
                     </FormControl>
@@ -359,28 +380,30 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                       className={classes.textField}
                       disabled={!campaignEditable}
                     />
-                    </Grid>
+                  </Grid>
                   <Grid xs={12} md={4} item>
-                  <FormControl
+                    <FormControl
                       variant="outlined"
                       margin="dense"
-                      className={classes.FormControl}
+                      className={classes.formControl}
                       fullWidth
                     >
-                      <InputLabel id="fileListId-selection-label">{i18n.t("campaigns.dialog.form.fileList")}</InputLabel>
+                      <InputLabel id="fileList-selection-label">
+                        {i18n.t("campaigns.dialog.form.fileList")}
+                      </InputLabel>
                       <Field
                         as={Select}
                         label={i18n.t("campaigns.dialog.form.fileList")}
                         name="fileListId"
                         id="fileListId"
                         placeholder={i18n.t("campaigns.dialog.form.fileList")}
-                        labelId="fileListId-selection-label"
-                        value={values.fileListId || ""}
+                        labelId="fileList-selection-label"
+                        disabled={!campaignEditable}
                       >
-                        <MenuItem value={""} >{"Nenhum"}</MenuItem>
-                        {file.map(f => (
-                          <MenuItem key={f.id} value={f.id}>
-                            {f.name}
+                        <MenuItem value="">Ninguno</MenuItem>
+                        {files.map(file => (
+                          <MenuItem key={file.id} value={file.id}>
+                            {file.name}
                           </MenuItem>
                         ))}
                       </Field>

@@ -290,7 +290,7 @@ export function QueueOptionStepper({ queueId, options, updateOptions }) {
                 variant="outlined"
                 className={classes.addButton}
               >
-                Adicionar
+                Agregar
               </Button>
             </>
           )}
@@ -392,7 +392,7 @@ export function QueueOptions({ queueId }) {
           style={{ marginLeft: 10 }}
           variant="outlined"
         >
-          Adicionar
+          Agregar
         </Button>
       </Typography>
       {renderStepper()}

@@ -192,7 +192,7 @@ const Prompts = () => {
       {/* Box vermelha com o aviso */}
       <Paper className={classes.redBox} variant="outlined">
         <Typography variant="body1">
-          <strong>Aviso ImportantePara Usuarios de Elevara CRM sobre OpenAI:</strong> A todos los usuarios que han experimentado una interrupción en el funcionamiento de OpenAI dentro del CRM, queremos informar que esto no se debe a un error del sistema. OpenAI otorga un crédito gratuito de $5 USD al momento de registrarse, pero este beneficio está limitado tanto por su monto como por un período de tiempo (generalmente de tres meses).
+          <strong>Aviso Importante Para Usuarios de Elevara CRM sobre OpenAI:</strong> A todos los usuarios que han experimentado una interrupción en el funcionamiento de OpenAI dentro del CRM, queremos informar que esto no se debe a un error del sistema. OpenAI otorga un crédito gratuito de $5 USD al momento de registrarse, pero este beneficio está limitado tanto por su monto como por un período de tiempo (generalmente de tres meses).
 
 Una vez que este crédito se agote, será necesario recargar tu cuenta para continuar utilizando el servicio de OpenAI integrado en nuestro CRM.
 

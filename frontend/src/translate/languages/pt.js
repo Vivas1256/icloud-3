@@ -120,7 +120,7 @@ const messages = {
       },
       whatsappModal: {
         title: {
-          add: "Adicionar WhatsApp",
+          add: "Agregar WhatsApp",
           edit: "Editar WhatsApp",
         },		
 		 tabs: {

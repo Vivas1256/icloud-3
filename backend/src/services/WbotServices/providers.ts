@@ -205,7 +205,7 @@ export const provider = async (ticket: Ticket, msg: proto.IWebMessageInfo, compa
                         });
 
 
-                        if (bloqueado === 'sim') {
+                        if (bloqueado === 'si') {
                           const bodyBloqueio = { text: formatBody(`${nome} vi tambem que a sua conexão esta bloqueada! Vou desbloquear para você por *48 horas*.`, contact) };
                           await sleep(2000)
                           await wbot.sendMessage(`${ticket.contact.number}@${ticket.isGroup ? "g.us" : "s.whatsapp.net"}`, bodyBloqueio);

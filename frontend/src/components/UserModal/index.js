@@ -253,7 +253,7 @@ const UserModal = ({ open, onClose, userId }) => {
 								
 								
 								<div className={classes.divider}>
-									<span className={classes.dividerText}>Lanzamientos</span>
+									<span className={classes.dividerText}>Espiar conversaciones solo Admin</span>
 								</div>
 								
 								<Can

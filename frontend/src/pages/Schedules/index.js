@@ -43,7 +43,7 @@ const eventTitleStyle = {
 
 const localizer = momentLocalizer(moment);
 var defaultMessages = {
-  date: "Data",
+  date: "Fecha",
   time: "Hora",
   event: "Evento",
   allDay: "Dia Todo",
@@ -53,11 +53,11 @@ var defaultMessages = {
   month: "Mês",
   previous: "Anterior",
   next: "Próximo",
-  yesterday: "Ontem",
-  tomorrow: "Amanhã",
-  today: "Hoje",
+  yesterday: "Ayer",
+  tomorrow: "Mañana",
+  today: "Hoy",
   agenda: "Agenda",
-  noEventsInRange: "Não há agendamentos no período.",
+  noEventsInRange: "No hay citas durante este periodo.",
   showMore: function showMore(total) {
     return "+" + total + " mais";
   }

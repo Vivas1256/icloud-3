@@ -319,7 +319,7 @@ const MainListItems = (props) => {
 	  
 	  <ListItemLink
         to="/todolist"
-        primary={i18n.t("Mis Tareas")}
+        primary={i18n.t("Notas Diarias")}
         icon={<BorderColorIcon />}
       />
 

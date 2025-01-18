@@ -9,19 +9,16 @@ import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import IconButton from "@material-ui/core/IconButton";
 import TextField from "@material-ui/core/TextField";
 import { green } from "@material-ui/core/colors";
 import { makeStyles } from "@material-ui/core/styles";
-import AttachFileIcon from "@material-ui/icons/AttachFile";
-import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
-import moment from "moment";
-import { i18n } from "../../translate/i18n";
-import { Box, FormControl, Grid, InputLabel, MenuItem, Select, Tab, Tabs } from "@material-ui/core";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
 import ConfirmationModal from "../ConfirmationModal";
+import { Box, FormControl, Grid, InputLabel, MenuItem, Select, Tab, Tabs } from "@material-ui/core";
+import moment from "moment";
+import { i18n } from "../../translate/i18n";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -59,7 +56,7 @@ const CampaignSchema = Yup.object().shape({
     .required("Required"),
 });
 
-const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, resetPagination }) => {
+const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave }) => {
   const classes = useStyles();
   const { user } = useContext(AuthContext);
   const { companyId } = user;

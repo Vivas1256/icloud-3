@@ -21,7 +21,7 @@ import { Box, FormControl, Grid, InputLabel, MenuItem, Select, Tab, Tabs } from 
 import { AuthContext } from "../../context/Auth/AuthContext";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
-import ConfirmationModal from "../ConfirmationModal";
+import ConfirmationModal from "../ConfirmationModal"; // Asegúrate de que esta ruta sea correcta
 
 const useStyles = makeStyles((theme) => ({
   root: {

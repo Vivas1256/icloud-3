@@ -402,6 +402,7 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave }) => 
                               placeholder={i18n.t("campaigns.dialog.form.messagePlaceholder")}
                               multiline={true}
                               variant="outlined"
+                              disabled={!campaignEditable}
                             />
                           </Grid>
                         </Grid>
@@ -418,6 +419,7 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave }) => 
                               placeholder={i18n.t("campaigns.dialog.form.messagePlaceholder")}
                               multiline={true}
                               variant="outlined"
+                              disabled={!campaignEditable}
                             />
                           </Grid>
                         </Grid>
@@ -434,6 +436,7 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave }) => 
                               placeholder={i18n.t("campaigns.dialog.form.messagePlaceholder")}
                               multiline={true}
                               variant="outlined"
+                              disabled={!campaignEditable}
                             />
                           </Grid>
                         </Grid>
@@ -450,6 +453,7 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave }) => 
                               placeholder={i18n.t("campaigns.dialog.form.messagePlaceholder")}
                               multiline={true}
                               variant="outlined"
+                              disabled={!campaignEditable}
                             />
                           </Grid>
                         </Grid>
@@ -466,6 +470,7 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave }) => 
                               placeholder={i18n.t("campaigns.dialog.form.messagePlaceholder")}
                               multiline={true}
                               variant="outlined"
+                              disabled={!campaignEditable}
                             />
                           </Grid>
                         </Grid>
@@ -483,21 +488,23 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave }) => 
                 >
                   {i18n.t("campaigns.dialog.buttons.close")}
                 </Button>
-                <Button 
-                  type="submit" 
-                  color="primary" 
-                  disabled={isSubmitting} 
-                  variant="contained" 
-                  className={classes.btnWrapper}
-                >
-                  {campaignId 
-                    ? i18n.t("campaigns.dialog.buttons.edit")
-                    : i18n.t("campaigns.dialog.buttons.add")
-                  }
-                  {isSubmitting && (
-                    <CircularProgress size={24} className={classes.buttonProgress} />
-                  )}
-                </Button>
+                {campaignEditable && (
+                  <Button 
+                    type="submit" 
+                    color="primary" 
+                    disabled={isSubmitting} 
+                    variant="contained" 
+                    className={classes.btnWrapper}
+                  >
+                    {campaignId 
+                      ? i18n.t("campaigns.dialog.buttons.edit")
+                      : i18n.t("campaigns.dialog.buttons.add")
+                    }
+                    {isSubmitting && (
+                      <CircularProgress size={24} className={classes.buttonProgress} />
+                    )}
+                  </Button>
+                )}
               </DialogActions>
             </Form>
           )}

@@ -176,13 +176,31 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
     }
   };
 
+  const deleteMedia = async () => {
+    if (attachment) {
+      setAttachment(null);
+      attachmentFile.current.value = null; // Limpiar el input de archivo
+    }
+
+    if (campaign.mediaPath) {
+      try {
+        await api.delete(`/campaigns/${campaign.id}/media-upload`);
+        setCampaign((prev) => ({ ...prev, mediaPath: null, mediaName: null }));
+        toast.success(i18n.t("campaigns.toasts.deleted"));
+      } catch (error) {
+        console.error("Error deleting media:", error);
+        toastError(error);
+      }
+    }
+  };
+
   return (
     <div className={classes.root}>
       <ConfirmationModal
         title={i18n.t("campaigns.confirmationModal.deleteTitle")}
         open={confirmationOpen}
         onClose={() => setConfirmationOpen(false)}
-        onConfirm={deleteMedia}
+        onConfirm={deleteMedia} // Aquí se utiliza la función
       >
         {i18n.t("campaigns.confirmationModal.deleteMessage")}
       </ConfirmationModal>

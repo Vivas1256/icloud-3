@@ -65,7 +65,15 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
   const { companyId } = user;
   const [attachment, setAttachment] = useState(null);
   const [files, setFiles] = useState([]);
-  const [campaign, setCampaign] = useState(initialValues || {
+  const [campaign, setCampaign] = useState(initialValues || getDefaultCampaign(companyId));
+  const [whatsapps, setWhatsapps] = useState([]);
+  const [contactLists, setContactLists] = useState([]);
+  const [tagLists, setTagLists] = useState([]);
+  const [messageTab, setMessageTab] = useState(0);
+  const [confirmationOpen, setConfirmationOpen] = useState(false);
+  const attachmentFile = useRef(null);
+
+  const getDefaultCampaign = (companyId) => ({
     name: "",
     message1: "",
     message2: "",
@@ -80,13 +88,6 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
     whatsappId: "",
     fileListId: "",
   });
-  const [whatsapps, setWhatsapps] = useState([]);
-  const [contactLists, setContactLists] = useState([]);
-  const [tagLists, setTagLists] = useState([]);
-  const [messageTab, setMessageTab] = useState(0);
-  const [confirmationOpen, setConfirmationOpen] = useState(false);
-  const [campaignEditable, setCampaignEditable] = useState(true);
-  const attachmentFile = useRef(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -126,41 +127,13 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
       };
       fetchCampaignData();
     } else {
-      setCampaign(initialValues || {
-        name: "",
-        message1: "",
-        message2: "",
-        message3: "",
-        message4: "",
-        message5: "",
-        scheduledAt: "",
-        status: "Inactiva",
-        companyId,
-        contactListId: "",
-        tagListId: "",
-        whatsappId: "",
-        fileListId: "",
-      });
+      setCampaign(getDefaultCampaign(companyId));
     }
-  }, [campaignId, open, initialValues]);
+  }, [campaignId, open, companyId]);
 
   const handleClose = () => {
     onClose();
-    setCampaign(initialValues || {
-      name: "",
-      message1: "",
-      message2: "",
-      message3: "",
-      message4: "",
-      message5: "",
-      scheduledAt: "",
-      status: "Inactiva",
-      companyId,
-      contactListId: "",
-      tagListId: "",
-      whatsappId: "",
-      fileListId: "",
-    });
+    setCampaign(getDefaultCampaign(companyId));
   };
 
   const handleAttachmentFile = (e) => {
@@ -267,7 +240,7 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
       </ConfirmationModal>
       <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md" scroll="paper">
         <DialogTitle id="form-dialog-title">
-          {campaignEditable ? (campaignId ? `${i18n.t("campaigns.dialog.update")}` : `${i18n.t("campaigns.dialog.new")}`) : `${i18n.t("campaigns.dialog.readonly")}`}
+          {campaignId ? `${i18n.t("campaigns.dialog.update")}` : `${i18n.t("campaigns.dialog.new")}`}
         </DialogTitle>
         <div style={{ display: "none" }}>
           <input type="file" ref={attachmentFile} onChange={handleAttachmentFile} />
@@ -298,7 +271,6 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                       margin="dense"
                       fullWidth
                       className={classes.textField}
-                      disabled={!campaignEditable}
                     />
                   </Grid>
                   <Grid xs={12} md={4} item>
@@ -312,7 +284,6 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                         labelId="contactList-selection-label"
                         id="contactListId"
                         name="contactListId"
-                        disabled={!campaignEditable}
                       >
                         <MenuItem value="">Ninguno</MenuItem>
                         {contactLists.map(contactList => (
@@ -334,7 +305,6 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                         labelId="tagList-selection-label"
                         id="tagListId"
                         name="tagListId"
-                        disabled={!campaignEditable}
                       >
                         <MenuItem value="">Ninguno</MenuItem>
                         {tagLists.map(tag => (
@@ -356,7 +326,6 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                         labelId="whatsapp-selection-label"
                         id="whatsappId"
                         name="whatsappId"
-                        disabled={!campaignEditable}
                       >
                         <MenuItem value="">Ninguno</MenuItem>
                         {whatsapps.map(whatsapp => (
@@ -378,7 +347,6 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                       InputLabelProps={{ shrink: true }}
                       fullWidth
                       className={classes.textField}
-                      disabled={!campaignEditable}
                     />
                   </Grid>
                   <Grid xs={12} md={4} item>
@@ -398,7 +366,6 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                         id="fileListId"
                         placeholder={i18n.t("campaigns.dialog.form.fileList")}
                         labelId="fileList-selection-label"
-                        disabled={!campaignEditable}
                       >
                         <MenuItem value="">Ninguno</MenuItem>
                         {files.map(file => (
@@ -438,7 +405,6 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                               placeholder={i18n.t("campaigns.dialog.form.messagePlaceholder")}
                               multiline={true}
                               variant="outlined"
-                              disabled={!campaignEditable}
                             />
                           </Grid>
                         </Grid>
@@ -455,7 +421,6 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                               placeholder={i18n.t("campaigns.dialog.form.messagePlaceholder")}
                               multiline={true}
                               variant="outlined"
-                              disabled={!campaignEditable}
                             />
                           </Grid>
                         </Grid>
@@ -472,7 +437,6 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                               placeholder={i18n.t("campaigns.dialog.form.messagePlaceholder")}
                               multiline={true}
                               variant="outlined"
-                              disabled={!campaignEditable}
                             />
                           </Grid>
                         </Grid>
@@ -489,7 +453,6 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                               placeholder={i18n.t("campaigns.dialog.form.messagePlaceholder")}
                               multiline={true}
                               variant="outlined"
-                              disabled={!campaignEditable}
                             />
                           </Grid>
                         </Grid>
@@ -506,7 +469,6 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                               placeholder={i18n.t("campaigns.dialog.form.messagePlaceholder")}
                               multiline={true}
                               variant="outlined"
-                              disabled={!campaignEditable}
                             />
                           </Grid>
                         </Grid>
@@ -524,23 +486,21 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                 >
                   {i18n.t("campaigns.dialog.buttons.close")}
                 </Button>
-                {campaignEditable && (
-                  <Button 
-                    type="submit" 
-                    color="primary" 
-                    disabled={isSubmitting} 
-                    variant="contained" 
-                    className={classes.btnWrapper}
-                  >
-                    {campaignId 
-                      ? i18n.t("campaigns.dialog.buttons.edit")
-                      : i18n.t("campaigns.dialog.buttons.add")
-                    }
-                    {isSubmitting && (
-                      <CircularProgress size={24} className={classes.buttonProgress} />
-                    )}
-                  </Button>
-                )}
+                <Button 
+                  type="submit" 
+                  color="primary" 
+                  disabled={isSubmitting} 
+                  variant="contained" 
+                  className={classes.btnWrapper}
+                >
+                  {campaignId 
+                    ? i18n.t("campaigns.dialog.buttons.edit")
+                    : i18n.t("campaigns.dialog.buttons.add")
+                  }
+                  {isSubmitting && (
+                    <CircularProgress size={24} className={classes.buttonProgress} />
+                  )}
+                </Button>
               </DialogActions>
             </Form>
           )}

@@ -427,87 +427,118 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                     </Tabs>
                     <Box style={{ paddingTop: 20 }}>
                       {messageTab === 0 && (
-                        <Field
-                          as={TextField}
-                          id="message1"
-                          name="message1"
-                          fullWidth
-                          rows={5}
-                          label={i18n.t("campaigns.dialog.form.message1")}
-                          placeholder={i18n.t("campaigns.dialog.form.messagePlaceholder")}
-                          multiline={true}
-                          variant="outlined"
-                          disabled={!campaignEditable}
-                        />
+                        <Grid container spacing={2}>
+                          <Grid xs={12} md={8} item>
+                            <Field
+                              as={TextField}
+                              name="message1"
+                              fullWidth
+                              rows={5}
+                              label={i18n.t("campaigns.dialog.form.message1")}
+                              placeholder={i18n.t("campaigns.dialog.form.messagePlaceholder")}
+                              multiline={true}
+                              variant="outlined"
+                              disabled={!campaignEditable}
+                            />
+                          </Grid>
+                        </Grid>
                       )}
                       {messageTab === 1 && (
-                        <Field
-                          as={TextField}
-                          id="message2"
-                          name="message2"
-                          fullWidth
-                          rows={5}
-                          label={i18n.t("campaigns.dialog.form.message2")}
-                          placeholder={i18n.t("campaigns.dialog.form.messagePlaceholder")}
-                          multiline={true}
-                          variant="outlined"
-                          disabled={!campaignEditable}
-                        />
+                        <Grid container spacing={2}>
+                          <Grid xs={12} md={8} item>
+                            <Field
+                              as={TextField}
+                              name="message2"
+                              fullWidth
+                              rows={5}
+                              label={i18n.t("campaigns.dialog.form.message2")}
+                              placeholder={i18n.t("campaigns.dialog.form.messagePlaceholder")}
+                              multiline={true}
+                              variant="outlined"
+                              disabled={!campaignEditable}
+                            />
+                          </Grid>
+                        </Grid>
                       )}
                       {messageTab === 2 && (
-                        <Field
-                          as={TextField}
-                          id="message3"
-                          name="message3"
-                          fullWidth
-                          rows={5}
-                          label={i18n.t("campaigns.dialog.form.message3")}
-                          placeholder={i18n.t("campaigns.dialog.form.messagePlaceholder")}
-                          multiline={true}
-                          variant="outlined"
-                          disabled={!campaignEditable}
-                        />
+                        <Grid container spacing={2}>
+                          <Grid xs={12} md={8} item>
+                            <Field
+                              as={TextField}
+                              name="message3"
+                              fullWidth
+                              rows={5}
+                              label={i18n.t("campaigns.dialog.form.message3")}
+                              placeholder={i18n.t("campaigns.dialog.form.messagePlaceholder")}
+                              multiline={true}
+                              variant="outlined"
+                              disabled={!campaignEditable}
+                            />
+                          </Grid>
+                        </Grid>
                       )}
                       {messageTab === 3 && (
-                        <Field
-                          as={TextField}
-                          id="message4"
-                          name="message4"
-                          fullWidth
-                          rows={5}
-                          label={i18n.t("campaigns.dialog.form.message4")}
-                          placeholder={i18n.t("campaigns.dialog.form.messagePlaceholder")}
-                          multiline={true}
-                          variant="outlined"
-                          disabled={!campaignEditable}
-                        />
+                        <Grid container spacing={2}>
+                          <Grid xs={12} md={8} item>
+                            <Field
+                              as={TextField}
+                              name="message4"
+                              fullWidth
+                              rows={5}
+                              label={i18n.t("campaigns.dialog.form.message4")}
+                              placeholder={i18n.t("campaigns.dialog.form.messagePlaceholder")}
+                              multiline={true}
+                              variant="outlined"
+                              disabled={!campaignEditable}
+                            />
+                          </Grid>
+                        </Grid>
                       )}
                       {messageTab === 4 && (
-                        <Field
-                          as={TextField}
-                          id="message5"
-                          name="message5"
-                          fullWidth
-                          rows={5}
-                          label={i18n.t("campaigns.dialog.form.message5")}
-                          placeholder={i18n.t("campaigns.dialog.form.messagePlaceholder")}
-                          multiline={true}
-                          variant="outlined"
-                          disabled={!campaignEditable}
-                        />
+                        <Grid container spacing={2}>
+                          <Grid xs={12} md={8} item>
+                            <Field
+                              as={TextField}
+                              name="message5"
+                              fullWidth
+                              rows={5}
+                              label={i18n.t("campaigns.dialog.form.message5")}
+                              placeholder={i18n.t("campaigns.dialog.form.messagePlaceholder")}
+                              multiline={true}
+                              variant="outlined"
+                              disabled={!campaignEditable}
+                            />
+                          </Grid>
+                        </Grid>
                       )}
                     </Box>
                   </Grid>
                 </Grid>
               </DialogContent>
               <DialogActions>
-                <Button onClick={handleClose} color="secondary" disabled={isSubmitting} variant="outlined">
+                <Button 
+                  onClick={handleClose} 
+                  color="secondary" 
+                  disabled={isSubmitting} 
+                  variant="outlined"
+                >
                   {i18n.t("campaigns.dialog.buttons.close")}
                 </Button>
-                {(campaignEditable) && (
-                  <Button type="submit" color="primary" disabled={isSubmitting} variant="contained" className={classes.btnWrapper}>
-                    {campaignId ? `${i18n.t("campaigns.dialog.buttons.edit")}` : `${i18n.t("campaigns.dialog.buttons.add")}`}
-                    {isSubmitting && <CircularProgress size={24} className={classes.buttonProgress} />}
+                {campaignEditable && (
+                  <Button 
+                    type="submit" 
+                    color="primary" 
+                    disabled={isSubmitting} 
+                    variant="contained" 
+                    className={classes.btnWrapper}
+                  >
+                    {campaignId 
+                      ? i18n.t("campaigns.dialog.buttons.edit")
+                      : i18n.t("campaigns.dialog.buttons.add")
+                    }
+                    {isSubmitting && (
+                      <CircularProgress size={24} className={classes.buttonProgress} />
+                    )}
                   </Button>
                 )}
               </DialogActions>

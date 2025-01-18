@@ -359,7 +359,15 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                       className={classes.textField}
                       disabled={!campaignEditable}
                     />
-                    <InputLabel id="fileListId-selection-label">{i18n.t("campaigns.dialog.form.fileList")}</InputLabel>
+                    </Grid>
+                  <Grid xs={12} md={4} item>
+                  <FormControl
+                      variant="outlined"
+                      margin="dense"
+                      className={classes.FormControl}
+                      fullWidth
+                    >
+                      <InputLabel id="fileListId-selection-label">{i18n.t("campaigns.dialog.form.fileList")}</InputLabel>
                       <Field
                         as={Select}
                         label={i18n.t("campaigns.dialog.form.fileList")}
@@ -369,13 +377,15 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                         labelId="fileListId-selection-label"
                         value={values.fileListId || ""}
                       >
-                        <MenuItem value={""} >{"Ninguno"}</MenuItem>
+                        <MenuItem value={""} >{"Nenhum"}</MenuItem>
                         {file.map(f => (
                           <MenuItem key={f.id} value={f.id}>
                             {f.name}
                           </MenuItem>
                         ))}
-                    </Grid>
+                      </Field>
+                    </FormControl>
+                  </Grid>
                   <Grid xs={12} item>
                     <Tabs
                       value={messageTab}

@@ -251,7 +251,7 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                         name="contactListId"
                         disabled={!campaignEditable}
                       >
-                        <MenuItem value="">Nenhuma</MenuItem>
+                        <MenuItem value="">Ninguno</MenuItem>
                         {contactLists.map(contactList => (
                           <MenuItem key={contactList.id} value={contactList.id}>{contactList.name}</MenuItem>
                         ))}
@@ -269,7 +269,7 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                         name="tagListId"
                         disabled={!campaignEditable}
                       >
-                        <MenuItem value="">Nenhuma</MenuItem>
+                        <MenuItem value="">Ninguno</MenuItem>
                         {tagLists.map(tag => (
                           <MenuItem key={tag.id} value={tag.id}>{tag.name}</MenuItem>
                         ))}
@@ -287,7 +287,7 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                         name="whatsappId"
                         disabled={!campaignEditable}
                       >
-                        <MenuItem value="">Nenhuma</MenuItem>
+                        <MenuItem value="">Ninguno</MenuItem>
                         {whatsapps.map(whatsapp => (
                           <MenuItem key={whatsapp.id} value={whatsapp.id}>{whatsapp.name}</MenuItem>
                         ))}

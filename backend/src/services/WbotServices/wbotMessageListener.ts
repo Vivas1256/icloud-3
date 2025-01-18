@@ -1174,7 +1174,7 @@ const verifyQueue = async (
       text: formatBody(`\u200e${greetingMessage}\n\n${options}`, contact),
     };
     let lastMsg = map_msg.get(contact.number)
-    let invalidOption = "Opção inválida, por favor, escolha uma opção válida."
+    let invalidOption = "Opcion invalida, por favor seleccione una opcion valida para mejor atencion."
     
 
     // console.log('getBodyMessage(msg)', getBodyMessage(msg))
@@ -1238,7 +1238,7 @@ const verifyQueue = async (
 
 
         if (now.isBefore(startTime) || now.isAfter(endTime)) {
-          const body = formatBody(`\u200e ${queue.outOfHoursMessage}\n\n*[ # ]* - Voltar ao Menu Principal`, ticket.contact);
+          const body = formatBody(`\u200e ${queue.outOfHoursMessage}\n\n*[ # ]* - Volver al menu principal`, ticket.contact);
           console.log('body222', body)
           const sentMessage = await wbot.sendMessage(
             `${contact.number}@${ticket.isGroup ? "g.us" : "s.whatsapp.net"}`, {
@@ -1684,7 +1684,7 @@ const handleChartbot = async (ticket: Ticket, msg: WAMessage, wbot: Session, don
 
         const listMessage = {
           text: formatBody(`\u200e${currentOption.message}`, ticket.contact),
-          buttonText: "Escolha uma opção",
+          buttonText: "Escoja una opcion",
           sections
         };
 

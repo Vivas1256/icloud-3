@@ -21,7 +21,7 @@ import { Box, FormControl, Grid, InputLabel, MenuItem, Select, Tab, Tabs } from 
 import { AuthContext } from "../../context/Auth/AuthContext";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
-import ConfirmationModal from "../ConfirmationModal";
+import ConfirmationModal from "../ConfirmationModal"; // Asegúrate de que esta ruta sea correcta
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -102,6 +102,39 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
     fetchData();
   }, [companyId]);
 
+  useEffect(() => {
+    if (campaignId) {
+      const fetchCampaignData = async () => {
+        try {
+          const { data } = await api.get(`/campaigns/${campaignId}`);
+          setCampaign({
+            ...data,
+            scheduledAt: moment(data.scheduledAt).format("YYYY-MM-DDTHH:mm"), // Formato correcto
+          });
+        } catch (error) {
+          console.error("Error fetching campaign data:", error);
+          toastError(error);
+        }
+      };
+      fetchCampaignData();
+    } else {
+      setCampaign(initialValues || {
+        name: "",
+        message1: "",
+        message2: "",
+        message3: "",
+        message4: "",
+        message5: "",
+        scheduledAt: "",
+        status: "Inactiva",
+        companyId,
+        contactListId: "",
+        tagListId: "",
+        whatsappId: "",
+      });
+    }
+  }, [campaignId, open, initialValues]);
+
   const handleClose = () => {
     onClose();
     setCampaign(initialValues || {
@@ -130,21 +163,28 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
   const sendMessages = async (campaignId, messages) => {
     for (let i = 0; i < messages.length; i++) {
       const message = messages[i];
-      try {
-        await api.post(`/campaigns/${campaignId}/send-message`, { message });
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Espera 1 segundo entre mensajes
-      } catch (error) {
-        console.error("Error sending message:", error);
-        break; // Detener el envío si hay un error
+      if (message) { // Asegúrate de que el mensaje no esté vacío
+        try {
+          await api.post(`/campaigns/${campaignId}/send-message`, { message });
+          await new Promise(resolve => setTimeout(resolve, 1000)); // Espera 1 segundo entre mensajes
+        } catch (error) {
+          console.error("Error sending message:", error);
+          break; // Detener el envío si hay un error
+        }
       }
     }
   };
 
   const handleSaveCampaign = async (values) => {
     try {
+      // Sumar 2 horas a la hora programada
+      const scheduledAt = values.scheduledAt 
+          ? moment(values.scheduledAt).add(2, 'hours').format("YYYY-MM-DD HH:mm:ss") 
+          : null;
+
       const dataValues = {
-        ...values,
-        scheduledAt: values.scheduledAt ? moment(values.scheduledAt).format("YYYY-MM-DD HH:mm:ss") : null,
+          ...values,
+          scheduledAt: scheduledAt, // Usar la hora ajustada
       };
 
       if (campaignId) {
@@ -154,7 +194,13 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
           formData.append("file", attachment);
           await api.post(`/campaigns/${campaignId}/media-upload`, formData);
         }
-        await sendMessages(campaignId, [values.message1, values.message2, values.message3, values.message4, values.message5]);
+        await sendMessages(campaignId, [
+            values.message1,
+            values.message2,
+            values.message3,
+            values.message4,
+            values.message5
+        ]);
         handleClose();
       } else {
         const { data } = await api.post("/campaigns", dataValues);
@@ -163,7 +209,13 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
           formData.append("file", attachment);
           await api.post(`/campaigns/${data.id}/media-upload`, formData);
         }
-        await sendMessages(data.id, [values.message1, values.message2, values.message3, values.message4, values.message5]);
+        await sendMessages(data.id, [
+            values.message1,
+            values.message2,
+            values.message3,
+            values.message4,
+            values.message5
+        ]);
         if (onSave) {
           onSave(data);
         }
@@ -251,7 +303,7 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                         name="contactListId"
                         disabled={!campaignEditable}
                       >
-                        <MenuItem value="">Ninguno</MenuItem>
+                        <MenuItem value="">Nenhuma</MenuItem>
                         {contactLists.map(contactList => (
                           <MenuItem key={contactList.id} value={contactList.id}>{contactList.name}</MenuItem>
                         ))}
@@ -269,7 +321,7 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                         name="tagListId"
                         disabled={!campaignEditable}
                       >
-                        <MenuItem value="">Ninguno</MenuItem>
+                        <MenuItem value="">Nenhuma</MenuItem>
                         {tagLists.map(tag => (
                           <MenuItem key={tag.id} value={tag.id}>{tag.name}</MenuItem>
                         ))}
@@ -287,7 +339,7 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                         name="whatsappId"
                         disabled={!campaignEditable}
                       >
-                        <MenuItem value="">Ninguno</MenuItem>
+                        <MenuItem value="">Nenhuma</MenuItem>
                         {whatsapps.map(whatsapp => (
                           <MenuItem key={whatsapp.id} value={whatsapp.id}>{whatsapp.name}</MenuItem>
                         ))}

@@ -658,11 +658,11 @@ const messages = {
         },
         table: {
           name: "Nombre",
-          whatsapp: "conexión",
+          whatsapp: "Conexión",
           contactList: "Lista de Contactos",
           status: "Status",
           scheduledAt: "Recordatorio",
-          completedAt: "Concluída",
+          completedAt: "Completada",
           confirmation: "Confirmación",
           actions: "Acciones",
         },

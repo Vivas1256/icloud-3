@@ -133,7 +133,7 @@ const CampaignsConfig = () => {
         <Box className={classes.tabPanelsContainer}>
           <Grid spacing={2} container>
             <Grid xs={12} item>
-              <Typography component={"h3"}>Intervalos</Typography>
+              <Typography component={"h3"}>Intervalos en tiempos de envio</Typography>
             </Grid>
             <Grid xs={12} md={4} item>
               <FormControl
@@ -142,21 +142,27 @@ const CampaignsConfig = () => {
                 fullWidth
               >
                 <InputLabel id="messageInterval-label">
-                  Intervalo Randômico de Disparo
+                Intervalo de activación aleatorio
                 </InputLabel>
                 <Select
                   name="messageInterval"
                   id="messageInterval"
                   labelId="messageInterval-label"
-                  label="Intervalo Randômico de Disparo"
+                  label="Intervalo de activación aleatorio"
                   value={settings.messageInterval}
                   onChange={(e) => handleOnChangeSettings(e)}
                 >
-                  <MenuItem value={0}>Sem Intervalo</MenuItem>
+                  <MenuItem value={0}>Sin Intervalo</MenuItem>
                   <MenuItem value={5}>5 segundos</MenuItem>
                   <MenuItem value={10}>10 segundos</MenuItem>
                   <MenuItem value={15}>15 segundos</MenuItem>
                   <MenuItem value={20}>20 segundos</MenuItem>
+                  <MenuItem value={30}>30 segundos</MenuItem>
+                  <MenuItem value={40}>40 segundos</MenuItem>
+                  <MenuItem value={60}>60 segundos</MenuItem>
+                  <MenuItem value={80}>80 segundos</MenuItem>
+                  <MenuItem value={100}>100 segundos</MenuItem>
+                  <MenuItem value={120}>120 segundos</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -167,17 +173,17 @@ const CampaignsConfig = () => {
                 fullWidth
               >
                 <InputLabel id="longerIntervalAfter-label">
-                  Intervalo Maior Após
+                Intervalo mayor después
                 </InputLabel>
                 <Select
                   name="longerIntervalAfter"
                   id="longerIntervalAfter"
                   labelId="longerIntervalAfter-label"
-                  label="Intervalo Maior Após"
+                  label="Intervalo mayor después"
                   value={settings.longerIntervalAfter}
                   onChange={(e) => handleOnChangeSettings(e)}
                 >
-                  <MenuItem value={0}>Não definido</MenuItem>
+                  <MenuItem value={0}>No Definido</MenuItem>
                   <MenuItem value={1}>1 segundo</MenuItem>
                   <MenuItem value={5}>5 segundos</MenuItem>
                   <MenuItem value={10}>10 segundos</MenuItem>
@@ -199,17 +205,17 @@ const CampaignsConfig = () => {
                 fullWidth
               >
                 <InputLabel id="greaterInterval-label">
-                  Intervalo de Disparo Maior
+                Intervalo de disparo más largo
                 </InputLabel>
                 <Select
                   name="greaterInterval"
                   id="greaterInterval"
                   labelId="greaterInterval-label"
-                  label="Intervalo de Disparo Maior"
+                  label="Intervalo de disparo más largo"
                   value={settings.greaterInterval}
                   onChange={(e) => handleOnChangeSettings(e)}
                 >
-                  <MenuItem value={0}>Sem Intervalo</MenuItem>
+                  <MenuItem value={0}>Sin Intervalo</MenuItem>
                   <MenuItem value={1}>1 segundo</MenuItem>
                   <MenuItem value={5}>5 segundos</MenuItem>
                   <MenuItem value={10}>10 segundos</MenuItem>
@@ -244,7 +250,7 @@ const CampaignsConfig = () => {
               <>
                 <Grid xs={12} md={6} item>
                   <TextField
-                    label="Atalho"
+                    label="Atajo"
                     variant="outlined"
                     value={variable.key}
                     name="key"

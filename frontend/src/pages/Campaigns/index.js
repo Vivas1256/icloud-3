@@ -207,7 +207,7 @@ const Campaigns = () => {
       case "PROGRAMADA":
         return "Programada";
       case "EM_ANDAMENTO":
-        return "Em Andamento";
+        return "En proceso";
       case "CANCELADA":
         return "Cancelada";
       case "FINALIZADA":

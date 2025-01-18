@@ -375,7 +375,7 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                             {f.name}
                           </MenuItem>
                         ))}
-                  </Grid>
+                    </Grid>
                   <Grid xs={12} item>
                     <Tabs
                       value={messageTab}

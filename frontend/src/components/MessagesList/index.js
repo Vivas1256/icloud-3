@@ -275,13 +275,18 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
       const { data } = await api.get("/messages/" + ticketId, {
         params: { pageNumber: 1, pageSize: 1000000 },
       });
-
+  
       if (currentTicketId.current === ticketId) {
-        dispatch({ type: "LOAD_MESSAGES", payload: data.messages });
+        // Ordena los mensajes por fecha de creación
+        const sortedMessages = data.messages.sort((a, b) => 
+          new Date(a.createdAt) - new Date(b.createdAt)
+        );
+        
+        dispatch({ type: "LOAD_MESSAGES", payload: sortedMessages });
         setHasMore(false);
         setLoading(false);
       }
-
+  
       if (data.messages.length > 1) {
         scrollToBottom();
       }
@@ -408,35 +413,24 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
   };
 
   const renderDailyTimestamps = (message, index) => {
-    if (index === 0) {
-      return (
-        <span
-          className={classes.dailyTimestamp}
-          key={`timestamp-${message.id}`}
-        >
-          <div className={classes.dailyTimestampText}>
-            {format(parseISO(messagesList[index].createdAt), "dd/MM/yyyy")}
-          </div>
-        </span>
-      );
-    }
-    if (index < messagesList.length - 1) {
-      let messageDay = parseISO(messagesList[index].createdAt);
-      let previousMessageDay = parseISO(messagesList[index - 1].createdAt);
-
-      if (!isSameDay(messageDay, previousMessageDay)) {
+    if (index === 0 || index < messagesList.length) {
+      let messageDay = parseISO(message.createdAt);
+      let previousMessageDay = index > 0 ? parseISO(messagesList[index - 1].createdAt) : null;
+  
+      if (index === 0 || !previousMessageDay || !isSameDay(messageDay, previousMessageDay)) {
         return (
           <span
             className={classes.dailyTimestamp}
             key={`timestamp-${message.id}`}
           >
             <div className={classes.dailyTimestampText}>
-              {format(parseISO(messagesList[index].createdAt), "dd/MM/yyyy")}
+              {format(messageDay, "dd/MM/yyyy")}
             </div>
           </span>
         );
       }
     }
+  
     if (index === messagesList.length - 1) {
       return (
         <div
@@ -446,6 +440,8 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
         />
       );
     }
+  
+    return null;
   };
 
   const renderNumberTicket = (message, index) => {

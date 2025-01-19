@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useReducer } from "react";
 import { toast } from "react-toastify";
-
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
@@ -9,26 +8,13 @@ import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
-import IconButton from "@material-ui/core/IconButton";
-import SearchIcon from "@material-ui/icons/Search";
-import TextField from "@material-ui/core/TextField";
-import InputAdornment from "@material-ui/core/InputAdornment";
-
-import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
-import EditIcon from "@material-ui/icons/Edit";
-
 import MainContainer from "../../components/MainContainer";
 import MainHeader from "../../components/MainHeader";
-import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper";
 import Title from "../../components/Title";
 import SubscriptionModal from "../../components/SubscriptionModal";
 import api from "../../services/api";
 import { i18n } from "../../translate/i18n";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
-import UserModal from "../../components/UserModal";
-import ConfirmationModal from "../../components/ConfirmationModal";
-import toastError from "../../errors/toastError";
-
 import moment from "moment";
 
 const reducer = (state, action) => {
@@ -92,22 +78,21 @@ const Invoices = () => {
   const [hasMore, setHasMore] = useState(false);
   const [searchParam, setSearchParam] = useState("");
   const [invoices, dispatch] = useReducer(reducer, []);
-  const [storagePlans, setStoragePlans] = React.useState([]);
+  const [storagePlans, setStoragePlans] = useState([]);
   const [selectedContactId, setSelectedContactId] = useState(null);
   const [contactModalOpen, setContactModalOpen] = useState(false);
 
-
-  const handleOpenContactModal = (invoices) => {
-    setStoragePlans(invoices);
-    setSelectedContactId(null);
+  const handleOpenContactModal = (invoice) => {
+    setStoragePlans(invoice.storagePlans); // Asegúrate de que el objeto invoice tenga la propiedad storagePlans
+    setSelectedContactId(invoice.id);
     setContactModalOpen(true);
   };
-
 
   const handleCloseContactModal = () => {
     setSelectedContactId(null);
     setContactModalOpen(false);
   };
+
   useEffect(() => {
     dispatch({ type: "RESET" });
     setPageNumber(1);
@@ -133,7 +118,6 @@ const Invoices = () => {
     return () => clearTimeout(delayDebounceFn);
   }, [searchParam, pageNumber]);
 
-
   const loadMore = () => {
     setPageNumber((prevState) => prevState + 1);
   };
@@ -145,32 +129,18 @@ const Invoices = () => {
       loadMore();
     }
   };
-  const rowStyle = (record) => {
-    const hoje = moment(moment()).format("DD/MM/yyyy");
-    const vencimento = moment(record.dueDate).format("DD/MM/yyyy");
-    var diff = moment(vencimento, "DD/MM/yyyy").diff(moment(hoje, "DD/MM/yyyy"));
-    var dias = moment.duration(diff).asDays();    
-    if (dias < 0 && record.status !== "paid") {
-      return { backgroundColor: "#ffbcbc9c" };
-    }
+
+  const handlePayment = (invoice) => {
+    // Captura el nombre de la compañía desde el objeto invoice
+    const companyName = invoice.companyName || "mi compañía"; // Cambia "mi compañía" por un valor por defecto si es necesario
+
+    // Construir el mensaje para WhatsApp
+    const message = `Se%20venció%20mi%20Plan%20de%20${companyName}%20me%20ayudas%20a%20renovarlo%20por%20favor`;
+
+    // Redirigir a la URL de WhatsApp
+    const paymentUrl = `https://wa.me/+573246318019?text=${message}`;
+    window.location.href = paymentUrl; // Redirigir al usuario a WhatsApp
   };
-
-  const rowStatus = (record) => {
-    const hoje = moment(moment()).format("DD/MM/yyyy");
-    const vencimento = moment(record.dueDate).format("DD/MM/yyyy");
-    var diff = moment(vencimento, "DD/MM/yyyy").diff(moment(hoje, "DD/MM/yyyy"));
-    var dias = moment.duration(diff).asDays();    
-    const status = record.status;
-    if (status === "paid") {
-      return "Pago";
-    }
-    if (dias < 0) {
-      return "Vencido";
-    } else {
-      return "Activo"
-    }
-
-  }
 
   return (
     <MainContainer>
@@ -180,16 +150,11 @@ const Invoices = () => {
         aria-labelledby="form-dialog-title"
         Invoice={storagePlans}
         contactId={selectedContactId}
-
-      ></SubscriptionModal>
+      />
       <MainHeader>
         <Title>Facturas</Title>
       </MainHeader>
-      <Paper
-        className={classes.mainPaper}
-        variant="outlined"
-        onScroll={handleScroll}
-      >
+      <Paper className={classes.mainPaper} variant="outlined" onScroll={handleScroll}>
         <Table size="small">
           <TableHead>
             <TableRow>
@@ -202,38 +167,32 @@ const Invoices = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            <>
-              {invoices.map((invoices) => (
-                <TableRow style={rowStyle(invoices)} key={invoices.id}>
-                  <TableCell align="center">{invoices.id}</TableCell>
-                  <TableCell align="center">{invoices.detail}</TableCell>
-                  <TableCell style={{ fontWeight: 'bold' }} align="center">{invoices.value.toLocaleString('en-USD', { style: 'currency', currency: 'USD' })}</TableCell>
-                  <TableCell align="center">{moment(invoices.dueDate).format("DD/MM/YYYY")}</TableCell>
-                  <TableCell style={{ fontWeight: 'bold' }} align="center">{rowStatus(invoices)}</TableCell>
-                  <TableCell align="center">
-                    {rowStatus(invoices) !== "Pago" ?
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        color="secondary"
-                        onClick={() => handleOpenContactModal(invoices)}
-                      >
-                        PAGAR
-                      </Button> :
-                      <Button
-                        size="small"
-                        variant="outlined" 
-                        /* color="secondary"
-                        disabled */
-                      >
-                        PAGO 
-                      </Button>}
-
-                  </TableCell>
-                </TableRow>
-              ))}
-              {loading && <TableRowSkeleton columns={4} />}
-            </>
+            {invoices.map((invoice) => (
+              <TableRow key={invoice.id}>
+                <TableCell align="center">{invoice.id}</TableCell>
+                <TableCell align="center">{invoice.detail}</TableCell>
+                <TableCell align="center">{invoice.value.toLocaleString('en-USD', { style: 'currency', currency: 'USD' })}</TableCell>
+                <TableCell align="center">{moment(invoice.dueDate).format("DD/MM/YYYY")}</TableCell>
+                <TableCell align="center">{invoice.status}</TableCell>
+                <TableCell align="center">
+                  {invoice.status !== "paid" ? (
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      color="secondary"
+                      onClick={() => handlePayment(invoice)} // Cambia aquí para redirigir al pago
+                    >
+                      PAGAR
+                    </Button>
+                  ) : (
+                    <Button size="small" variant="outlined" disabled>
+                      PAGO
+                    </Button>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+            {loading && <TableRowSkeleton columns={4} />}
           </TableBody>
         </Table>
       </Paper>

@@ -4,7 +4,7 @@ import Company from "../../models/Company";
 import Whatsapp from "../../models/Whatsapp";
 import ContactList from "../../models/ContactList";
 
-interface FindServiceParams {
+export interface FindServiceParams {
   companyId: string | number;
   searchParam?: string;
   status?: string;
@@ -18,7 +18,7 @@ export interface FindServiceResult {
   hasMore: boolean;
 }
 
-const FindService = async ({
+export const FindService = async ({
   companyId,
   searchParam = '',
   status,
@@ -70,5 +70,3 @@ const FindService = async ({
     hasMore
   };
 };
-
-export { FindService };

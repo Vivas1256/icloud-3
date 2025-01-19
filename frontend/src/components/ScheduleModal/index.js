@@ -76,7 +76,7 @@ const ScheduleModal = ({ open, onClose, scheduleId, contactId, cleanContact, rel
 	const initialState = {
 		body: "",
 		contactId: "",
-		sendAt: moment().add(1, 'hour').format('YYYY-MM-DDTHH:mm'),
+		sendAt: moment().add(1, 'minutes').format('YYYY-MM-DDTHH:mm'),
 		sentAt: ""
 	};
 

@@ -297,18 +297,24 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
   const fetchMessages = async () => {
     if (ticketId === undefined) return;
     try {
+      setLoading(true);
       const { data } = await api.get("/messages/" + ticketId, {
         params: { 
           pageNumber: 1, 
           pageSize: 1000000,
-          includeAll: true, // Añade este parámetro si tu API lo soporta
-          startDate: '1970-01-01' // Solicita mensajes desde una fecha muy antigua
+          includeAll: true,
+          startDate: '1970-01-01'
         },
       });
   
       console.log("Mensajes recibidos:", data.messages);
   
       if (currentTicketId.current === ticketId) {
+        const messagesList = document.getElementById("messagesList");
+        const previousScrollHeight = messagesList.scrollHeight;
+        const previousScrollTop = messagesList.scrollTop;
+        const wasAtBottom = previousScrollHeight - previousScrollTop === messagesList.clientHeight;
+  
         // Ordena los mensajes por fecha de creación
         const sortedMessages = data.messages.sort((a, b) => 
           new Date(a.createdAt) - new Date(b.createdAt)
@@ -318,24 +324,58 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
   
         dispatch({ type: "LOAD_MESSAGES", payload: sortedMessages });
         setHasMore(false);
-        setLoading(false);
-      }
   
-      if (data.messages.length > 1) {
-        scrollToBottom();
+        // Espera a que el DOM se actualice
+        setTimeout(() => {
+          const newScrollHeight = messagesList.scrollHeight;
+  
+          if (data.messages.length > 0) {
+            if (wasAtBottom) {
+              // Si estaba en la parte inferior, mantener en la parte inferior
+              scrollToBottom(false);
+            } else {
+              // Mantener la posición de desplazamiento relativa
+              messagesList.scrollTop = newScrollHeight - previousScrollHeight + previousScrollTop;
+            }
+          }
+          setLoading(false);
+        }, 0);
       }
     } catch (err) {
       console.error("Error al obtener mensajes:", err);
+      
+      // Logging más detallado del error
+      if (err.response) {
+        console.error("Respuesta del servidor:", err.response.data);
+        console.error("Código de estado:", err.response.status);
+        console.error("Headers:", err.response.headers);
+      } else if (err.request) {
+        console.error("No se recibió respuesta del servidor");
+        console.error("Detalles de la solicitud:", err.request);
+      } else {
+        console.error("Error de configuración de la solicitud:", err.message);
+      }
+    
+      console.error("Configuración de la solicitud:", err.config);
+    
       setLoading(false);
-      toastError(err);
+      
+      if (err.response && err.response.data && err.response.data.error) {
+        toastError(`Error: ${err.response.data.error}`);
+      } else {
+        toastError("No se pudieron cargar los mensajes. Por favor, intenta de nuevo más tarde.");
+      }
     }
   };
 
-  const scrollToBottom = () => {
-    if (lastMessageRef.current) {
-      lastMessageRef.current.scrollIntoView({});
-    }
-  };
+    const scrollToBottom = (smooth = true) => {
+      if (lastMessageRef.current) {
+        lastMessageRef.current.scrollIntoView({
+          behavior: smooth ? "smooth" : "auto",
+          block: "end",
+        });
+      }
+    };
 
   const handleScroll = (e) => {
     const { scrollTop } = e.currentTarget;

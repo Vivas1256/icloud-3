@@ -601,7 +601,7 @@ const messages = {
           company: "Empresa",
           okEdit: "Editar",
           okAdd: "Añadir",
-          add: "Añadirr",
+          add: "Añadir",
           edit: "Editar",
           cancel: "Cancelar",
         },

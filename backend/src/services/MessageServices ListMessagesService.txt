@@ -11,7 +11,6 @@ interface Request {
   companyId: number;
   pageNumber?: string;
   queues?: number[];
-  limit?: number;
 }
 
 interface Response {
@@ -25,8 +24,7 @@ const ListMessagesService = async ({
   pageNumber = "1",
   ticketId,
   companyId,
-  queues = [],
-  limit = 20
+  queues = []
 }: Request): Promise<Response> => {
   const ticket = await ShowTicketService(ticketId, companyId);
 
@@ -34,6 +32,8 @@ const ListMessagesService = async ({
     throw new AppError("ERR_NO_TICKET_FOUND", 404);
   }
 
+  // await setMessagesAsRead(ticket);
+  const limit = 20;
   const offset = limit * (+pageNumber - 1);
 
   const options: FindOptions = {
@@ -54,7 +54,7 @@ const ListMessagesService = async ({
 
   const { count, rows: messages } = await Message.findAndCountAll({
     ...options,
-    limit: limit === 0 ? undefined : limit, // Si limit es 0, no se aplica límite
+    limit,
     include: [
       "contact",
       {
@@ -67,11 +67,11 @@ const ListMessagesService = async ({
         as: "queue"
       }
     ],
-    offset: limit === 0 ? undefined : offset, // Si limit es 0, no se aplica offset
+    offset,
     order: [["createdAt", "DESC"]]
   });
 
-  const hasMore = limit !== 0 && count > offset + messages.length;
+  const hasMore = count > offset + messages.length;
 
   return {
     messages: messages.reverse(),

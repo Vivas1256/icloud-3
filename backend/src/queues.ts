@@ -219,7 +219,7 @@ async function handleVerifySchedules(job) {
   try {
     const { count, rows: schedules } = await Schedule.findAndCountAll({
       where: {
-        status: "PENDENTE",
+        status: "PENDIENTE",
         sentAt: null,
         sendAt: {
           [Op.gte]: moment().format("YYYY-MM-DD HH:mm:ss"),
@@ -586,7 +586,7 @@ async function handleProcessCampaign(job) {
           logger.info(`Registro enviado pra fila de disparo: Campanha=${campaign.id};Contato=${contacts[i].name};delay=${delay}`);
         }
         await Promise.all(queuePromises);
-        await campaign.update({ status: "EM_ANDAMENTO" });
+        await campaign.update({ status: "En Proceso" });
       }
     }
   } catch (err: any) {

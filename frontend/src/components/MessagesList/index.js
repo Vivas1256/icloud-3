@@ -207,30 +207,38 @@ const reducer = (state, action) => {
   if (action.type === "ADD_MESSAGE") {
     const newMessage = action.payload;
     console.log("Añadiendo nuevo mensaje:", newMessage);
-    const messageIndex = state.findIndex((m) => m.id === newMessage.id);
-
-    if (messageIndex !== -1) {
-      // Si el mensaje ya existe, actualizarlo
-      const updatedState = [...state];
-      updatedState[messageIndex] = newMessage;
-      return updatedState;
-    } else {
-      // Si es un mensaje nuevo, añadirlo al final
-      return [...state, newMessage];
-    }
+    
+    // Crear una nueva lista de mensajes, excluyendo cualquier mensaje existente con el mismo ID
+    const updatedState = state.filter(m => m.id !== newMessage.id);
+    
+    // Añadir el nuevo mensaje
+    updatedState.push(newMessage);
+    
+    // Ordenar los mensajes por fecha de creación
+    const sortedState = updatedState.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    
+    console.log("Estado después de añadir mensaje:", sortedState);
+    return sortedState;
   }
-
+  
   if (action.type === "UPDATE_MESSAGE") {
     const messageToUpdate = action.payload;
     console.log("Actualizando mensaje:", messageToUpdate);
+    
     const messageIndex = state.findIndex((m) => m.id === messageToUpdate.id);
-
+  
     if (messageIndex !== -1) {
       const updatedState = [...state];
       updatedState[messageIndex] = messageToUpdate;
-      return updatedState;
+      
+      // Ordenar los mensajes por fecha de creación
+      const sortedState = updatedState.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+      
+      console.log("Estado después de actualizar mensaje:", sortedState);
+      return sortedState;
     }
-
+  
+    console.log("Mensaje no encontrado para actualizar, estado sin cambios");
     return state;
   }
 

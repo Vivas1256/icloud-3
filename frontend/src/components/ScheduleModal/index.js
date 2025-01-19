@@ -17,7 +17,7 @@ import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import { FormControl, Grid, IconButton } from "@material-ui/core";
 import Autocomplete from "@material-ui/lab/Autocomplete";
-import moment from "moment";
+import moment from "moment-timezone";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { isArray, capitalize } from "lodash";
 import DeleteOutline from "@material-ui/icons/DeleteOutline";
@@ -86,17 +86,10 @@ const ScheduleModal = ({ open, onClose, scheduleId, contactId, cleanContact, rel
     const attachmentFile = useRef(null);
     const [confirmationOpen, setConfirmationOpen] = useState(false);
     const messageInputRef = useRef();
+    const [userTimeZone, setUserTimeZone] = useState(moment.tz.guess());
 
     useEffect(() => {
-        if (contactId && contacts.length) {
-            const contact = contacts.find(c => c.id === contactId);
-            if (contact) {
-                setCurrentContact(contact);
-            }
-        }
-    }, [contactId, contacts]);
-
-    useEffect(() => {
+        setUserTimeZone(moment.tz.guess());
         const { companyId } = user;
         if (open) {
             try {
@@ -116,7 +109,7 @@ const ScheduleModal = ({ open, onClose, scheduleId, contactId, cleanContact, rel
 
                     const { data } = await api.get(`/schedules/${scheduleId}`);
                     setSchedule(prevState => {
-                        return { ...prevState, ...data, sendAt: moment(data.sendAt).format('YYYY-MM-DDTHH:mm') };
+                        return { ...prevState, ...data, sendAt: moment(data.sendAt).tz(userTimeZone).format('YYYY-MM-DDTHH:mm') };
                     });
                     setCurrentContact(data.contact);
                 })()
@@ -124,7 +117,7 @@ const ScheduleModal = ({ open, onClose, scheduleId, contactId, cleanContact, rel
                 toastError(err);
             }
         }
-    }, [scheduleId, contactId, open, user]);
+    }, [scheduleId, contactId, open, user, userTimeZone]);
 
     const handleClose = () => {
         onClose();
@@ -140,9 +133,8 @@ const ScheduleModal = ({ open, onClose, scheduleId, contactId, cleanContact, rel
     };
 
     const handleSaveSchedule = async values => {
-        // Sumar 2 horas a la hora seleccionada
-        const sendAtWithOffset = moment(values.sendAt).add(2, 'hours').format('YYYY-MM-DDTHH:mm');
-        const scheduleData = { ...values, sendAt: sendAtWithOffset, userId: user.id };
+        const utcSendAt = moment.tz(values.sendAt, userTimeZone).utc().format();
+        const scheduleData = { ...values, sendAt: utcSendAt, userId: user.id };
 
         try {
             if (scheduleId) {
@@ -309,6 +301,11 @@ const ScheduleModal = ({ open, onClose, scheduleId, contactId, cleanContact, rel
                                         helperText={touched.sendAt && errors.sendAt}
                                         variant="outlined"
                                         fullWidth
+                                        value={moment(values.sendAt).tz(userTimeZone).format('YYYY-MM-DDTHH:mm')}
+                                        onChange={(e) => {
+                                            const localDate = moment(e.target.value).tz(userTimeZone);
+                                            setFieldValue('sendAt', localDate.format('YYYY-MM-DDTHH:mm'));
+                                        }}
                                     />
                                 </div>
                                 {(schedule.mediaPath || attachment) && (

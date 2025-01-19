@@ -29,7 +29,7 @@ import Invoices from "../../pages/Financeiro";
 
 
 export default function CheckoutPage(props) {
-  const steps = ["Dados", "Personalizar", "Revisar"];
+  const steps = ["Datos", "Mi Plan", "Confirmacion"];
   const { formId, formField } = checkoutFormModel;
   
   
@@ -90,7 +90,7 @@ function _renderStepContent(step, setFieldValue, setActiveStep, values ) {
       setDatePayment(data)
       actions.setSubmitting(false);
       setActiveStep(activeStep + 1);
-      toast.success("Assinatura realizada com sucesso!, aguardando a realizaão do pagamento");
+      toast.success("¡Suscripción completada con éxito!, esperando pago");
     } catch (err) {
       toastError(err);
     }
@@ -113,7 +113,7 @@ function _renderStepContent(step, setFieldValue, setActiveStep, values ) {
   return (
     <React.Fragment>
       <Typography component="h1" variant="h4" align="center">
-        Falta pouco!
+      ¡Estamos a un paso de finalizar!
       </Typography>
       <Stepper activeStep={activeStep} className={classes.stepper}>
         {steps.map((label) => (
@@ -141,7 +141,7 @@ function _renderStepContent(step, setFieldValue, setActiveStep, values ) {
                 <div className={classes.buttons}>
                   {activeStep !== 1 && (
                     <Button onClick={_handleBack} className={classes.button}>
-                      VOLTAR
+                      VOLVER
                     </Button>
                   )}
                   <div className={classes.wrapper}>

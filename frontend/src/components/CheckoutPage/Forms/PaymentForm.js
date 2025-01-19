@@ -147,13 +147,13 @@ export default function Pricing(props) {
         price: plansCompanies.value,
         description: [
           `${plansCompanies.users} Usuarios`,
-          `${plansCompanies.connections} Conexion`,
+          `${plansCompanies.connections} Conexiones`,
           `${plansCompanies.queues} Dependencias`
         ],
         users: plansCompanies.users,
         connections: plansCompanies.connections,
         queues: plansCompanies.queues,
-        buttonText: 'SELECIONAR',
+        buttonText: 'SELECCIONAR',
         buttonVariant: 'outlined',
       })
 

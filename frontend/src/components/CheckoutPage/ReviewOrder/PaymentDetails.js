@@ -16,7 +16,7 @@ function PaymentDetails(props) {
   return (
     <Grid item container direction="column" xs={12} sm={6}>
       <Typography variant="h6" gutterBottom className={classes.title}>
-        Informação de pagamento
+      Información de pago
       </Typography>
       <Grid container>
         <React.Fragment>
@@ -29,7 +29,7 @@ function PaymentDetails(props) {
         </React.Fragment>
         <React.Fragment>
           <Grid item xs={6}>
-            <Typography gutterBottom>Nome:</Typography>
+            <Typography gutterBottom>Nombre:</Typography>
           </Grid>
           <Grid item xs={6}>
             <Typography gutterBottom>{firstName}</Typography>
@@ -37,7 +37,7 @@ function PaymentDetails(props) {
         </React.Fragment>
         <React.Fragment>
           <Grid item xs={6}>
-            <Typography gutterBottom>Endereço:</Typography>
+            <Typography gutterBottom>DIRECCIÓN:</Typography>
           </Grid>
           <Grid item xs={6}>
             <Typography gutterBottom>

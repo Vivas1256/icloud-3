@@ -165,9 +165,9 @@ const Invoices = () => {
       return "Pago";
     }
     if (dias < 0) {
-      return "Vencido";
+      return "Servicio Vencido";
     } else {
-      return "Em Aberto"
+      return "Servicio Activo"
     }
 
   }
@@ -183,7 +183,7 @@ const Invoices = () => {
 
       ></SubscriptionModal>
       <MainHeader>
-        <Title>Faturas</Title>
+        <Title>Facturas</Title>
       </MainHeader>
       <Paper
         className={classes.mainPaper}

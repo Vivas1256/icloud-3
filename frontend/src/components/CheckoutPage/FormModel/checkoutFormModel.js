@@ -3,48 +3,48 @@ export default {
   formField: {
     firstName: {
       name: 'firstName',
-      label: 'Nome completo*',
-      requiredErrorMsg: 'O nome completo é obrigatório'
+      label: 'Nombres*',
+      requiredErrorMsg: 'Nombre es obligatorio'
     },
     lastName: {
       name: 'lastName',
-      label: 'Last name*',
-      requiredErrorMsg: 'Last name is required'
+      label: 'Apellidos*',
+      requiredErrorMsg: 'Apellido es requerido'
     },
     address1: {
       name: 'address2',
-      label: 'Endereço*',
-      requiredErrorMsg: 'O Endereço é obrigatório'
+      label: 'Direccion*',
+      requiredErrorMsg: 'La direccion es obligatoria'
     },
 
     city: {
       name: 'city',
-      label: 'Cidade*',
-      requiredErrorMsg: 'Cidade é obrigatória'
+      label: 'Ciudad*',
+      requiredErrorMsg: 'Ciudad es obligatoria'
     },
     state: {
       name: 'state',
       label: 'Estado*',
-      requiredErrorMsg: 'Cidade é obrigatória'
+      requiredErrorMsg: 'Estado/Departamento es obligatoria'
     },
     zipcode: {
       name: 'zipcode',
-      label: 'CEP*',
-      requiredErrorMsg: 'CEP é obrigatório',
-      invalidErrorMsg: 'Formato de CEP inválido'
+      label: 'Codigo postal',
+      requiredErrorMsg: 'Codigo postal obligatorio',
+      invalidErrorMsg: 'Formato de Codigo postal inválido'
     },
     country: {
       name: 'country',
       label: 'País*',
-      requiredErrorMsg: 'País é obrigatório'
+      requiredErrorMsg: 'País es Obligatorio'
     },
     useAddressForPaymentDetails: {
       name: 'useAddressForPaymentDetails',
-      label: 'Use this address for payment details'
+      label: 'Utilice esta dirección para los detalles del pago'
     },
     invoiceId: {
       name: 'invoiceId',
-      label: 'Use this invoiceId'
+      label: 'Utilice este ID de factura'
     },
     nameOnCard: {
       name: 'nameOnCard',

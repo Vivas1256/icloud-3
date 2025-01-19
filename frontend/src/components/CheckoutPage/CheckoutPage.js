@@ -145,24 +145,30 @@ function _renderStepContent(step, setFieldValue, setActiveStep, values ) {
                     </Button>
                   )}
                   <div className={classes.wrapper}>
-                    {activeStep !== 1 && (
-                      <Button
-                        disabled={isSubmitting}
-                        type="submit"
-                        variant="contained"
-                        color="primary"
-                        className={classes.button}
-                      >
-                        {isLastStep ? "PAGAR" : "PRÓXIMO"}
-                      </Button>
-                    )}
-                    {isSubmitting && (
-                      <CircularProgress
-                        size={24}
-                        className={classes.buttonProgress}
-                      />
-                    )}
-                  </div>
+  {activeStep !== 1 && (
+    <Button
+      disabled={isSubmitting}
+      type="button" // Cambia a "button" para evitar el envío del formulario
+      variant="contained"
+      color="primary"
+      className={classes.button}
+      onClick={() => {
+        const number = '573246318019'; // Número de teléfono en formato internacional
+        const message = 'Se%20venció%20mi%20Plan%20me%20ayudas%20a%20renovarlo%20por%20favor'; // Mensaje que deseas enviar
+        const url = `https://wa.me/${number}?text=${message}`;
+        window.open(url, '_blank'); // Abre el enlace en una nueva pestaña
+      }}
+    >
+      {isLastStep ? "PAGAR" : "PRÓXIMO"}
+    </Button>
+  )}
+  {isSubmitting && (
+    <CircularProgress
+      size={24}
+      className={classes.buttonProgress}
+    />
+  )}
+</div>
                 </div>
               </Form>
             )}

@@ -16,6 +16,7 @@ import api from "../../services/api";
 import { i18n } from "../../translate/i18n";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
 import moment from "moment";
+import toastError from "../../errors/toastError"; // Asegúrate de que esta línea esté presente
 
 const reducer = (state, action) => {
   if (action.type === "LOAD_INVOICES") {

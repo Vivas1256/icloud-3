@@ -182,47 +182,64 @@ const useStyles = makeStyles((theme) => ({
 const reducer = (state, action) => {
   if (action.type === "LOAD_MESSAGES") {
     const messages = action.payload;
-    const newMessages = [];
-
-    messages.forEach((message) => {
-      const messageIndex = state.findIndex((m) => m.id === message.id);
-      if (messageIndex !== -1) {
-        state[messageIndex] = message;
+    console.log("Cargando mensajes en el reducer:", messages);
+    
+    // Crear un nuevo array con todos los mensajes, eliminando duplicados
+    const uniqueMessages = messages.reduce((acc, message) => {
+      const existingIndex = acc.findIndex(m => m.id === message.id);
+      if (existingIndex !== -1) {
+        // Si el mensaje ya existe, actualizarlo
+        acc[existingIndex] = message;
       } else {
-        newMessages.push(message);
+        // Si es un mensaje nuevo, añadirlo
+        acc.push(message);
       }
-    });
+      return acc;
+    }, []);
 
-    return [...newMessages, ...state];
+    // Ordenar los mensajes por fecha
+    uniqueMessages.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+
+    console.log("Mensajes únicos y ordenados:", uniqueMessages);
+    return uniqueMessages;
   }
 
   if (action.type === "ADD_MESSAGE") {
     const newMessage = action.payload;
+    console.log("Añadiendo nuevo mensaje:", newMessage);
     const messageIndex = state.findIndex((m) => m.id === newMessage.id);
 
     if (messageIndex !== -1) {
-      state[messageIndex] = newMessage;
+      // Si el mensaje ya existe, actualizarlo
+      const updatedState = [...state];
+      updatedState[messageIndex] = newMessage;
+      return updatedState;
     } else {
-      state.push(newMessage);
+      // Si es un mensaje nuevo, añadirlo al final
+      return [...state, newMessage];
     }
-
-    return [...state];
   }
 
   if (action.type === "UPDATE_MESSAGE") {
     const messageToUpdate = action.payload;
+    console.log("Actualizando mensaje:", messageToUpdate);
     const messageIndex = state.findIndex((m) => m.id === messageToUpdate.id);
 
     if (messageIndex !== -1) {
-      state[messageIndex] = messageToUpdate;
+      const updatedState = [...state];
+      updatedState[messageIndex] = messageToUpdate;
+      return updatedState;
     }
 
-    return [...state];
+    return state;
   }
 
   if (action.type === "RESET") {
+    console.log("Reseteando mensajes");
     return [];
   }
+
+  return state;
 };
 
 const MessagesList = ({ ticket, ticketId, isGroup }) => {
@@ -273,8 +290,15 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
     if (ticketId === undefined) return;
     try {
       const { data } = await api.get("/messages/" + ticketId, {
-        params: { pageNumber: 1, pageSize: 1000000 },
+        params: { 
+          pageNumber: 1, 
+          pageSize: 1000000,
+          includeAll: true, // Añade este parámetro si tu API lo soporta
+          startDate: '1970-01-01' // Solicita mensajes desde una fecha muy antigua
+        },
       });
+  
+      console.log("Mensajes recibidos:", data.messages);
   
       if (currentTicketId.current === ticketId) {
         // Ordena los mensajes por fecha de creación
@@ -282,6 +306,8 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
           new Date(a.createdAt) - new Date(b.createdAt)
         );
         
+        console.log("Mensajes ordenados:", sortedMessages);
+  
         dispatch({ type: "LOAD_MESSAGES", payload: sortedMessages });
         setHasMore(false);
         setLoading(false);
@@ -291,6 +317,7 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
         scrollToBottom();
       }
     } catch (err) {
+      console.error("Error al obtener mensajes:", err);
       setLoading(false);
       toastError(err);
     }
@@ -536,13 +563,20 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
   };
 
   const renderMessages = () => {
+    console.log("Renderizando mensajes, total:", messagesList.length);
+    
     if (messagesList.length > 0) {
       const viewMessagesList = messagesList.map((message, index) => {
-
+        console.log(`Renderizando mensaje ${index}:`, message);
+        
+        // Renderizar el timestamp diario
+        const dailyTimestamp = renderDailyTimestamps(message, index);
+        console.log(`Timestamp para mensaje ${index}:`, dailyTimestamp);
+  
         if (message.mediaType === "call_log") {
           return (
             <React.Fragment key={message.id}>
-              {renderDailyTimestamps(message, index)}
+              {dailyTimestamp}
               {renderNumberTicket(message, index)}
               {renderMessageDivider(message, index)}
               <div className={classes.messageCenter}>
@@ -570,11 +604,12 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
             </React.Fragment>
           );
         }
-
+  
         if (!message.fromMe) {
+          console.log(`Renderizando mensaje recibido ${index}`);
           return (
             <React.Fragment key={message.id}>
-              {renderDailyTimestamps(message, index)}
+              {dailyTimestamp}
               {renderNumberTicket(message, index)}
               {renderMessageDivider(message, index)}
               <div className={classes.messageLeft}>
@@ -593,7 +628,7 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
                     {message.contact?.name}
                   </span>
                 )}
-
+  
                 {message.isDeleted && (
                   <div>
                     <span className={"message-deleted"}
@@ -606,7 +641,7 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
                     </span>
                   </div>
                 )}
-
+  
                 {(message.mediaUrl || message.mediaType === "locationMessage" || message.mediaType === "vcard" || message.mediaType === "contactMessage") && checkMessageMedia(message)}
                 <div className={classes.textContentItem}>
                   {message.quotedMsg && renderQuotedMessage(message)}
@@ -621,9 +656,10 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
             </React.Fragment>
           );
         } else {
+          console.log(`Renderizando mensaje enviado ${index}`);
           return (
             <React.Fragment key={message.id}>
-              {renderDailyTimestamps(message, index)}
+              {dailyTimestamp}
               {renderNumberTicket(message, index)}
               {renderMessageDivider(message, index)}
               <div className={classes.messageRight}>
@@ -662,8 +698,11 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
           );
         }
       });
+      
+      console.log("Total de mensajes renderizados:", viewMessagesList.length);
       return viewMessagesList;
     } else {
+      console.log("No hay mensajes para renderizar");
       return <div>Diga olá para seu novo contato!</div>;
     }
   };

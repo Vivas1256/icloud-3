@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useReducer, useRef, useContext } from "react";
-
 import { isSameDay, parseISO, format } from "date-fns";
 import clsx from "clsx";
-
 import { green } from "@material-ui/core/colors";
 import {
   Button,
@@ -11,7 +9,6 @@ import {
   IconButton,
   makeStyles,
 } from "@material-ui/core";
-
 import {
   AccessTime,
   Block,
@@ -20,13 +17,12 @@ import {
   ExpandMore,
   GetApp,
 } from "@material-ui/icons";
-
 import MarkdownWrapper from "../MarkdownWrapper";
 import ModalImageCors from "../ModalImageCors";
 import MessageOptionsMenu from "../MessageOptionsMenu";
 import whatsBackground from "../../assets/wa-background.png";
 import LocationPreview from "../LocationPreview";
-import whatsBackgroundDark from "../../assets/wa-background-dark.png"; //DARK MODE PLW DESIGN//
+import whatsBackgroundDark from "../../assets/wa-background-dark.png";
 import VCardPreview from "../VCardPreview";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
@@ -43,9 +39,8 @@ const useStyles = makeStyles((theme) => ({
     minWidth: 300,
     minHeight: 200,
   },
-
   messagesList: {
-    backgroundImage: theme.mode === 'light' ? `url(${whatsBackground})` : `url(${whatsBackgroundDark})`, //DARK MODE PLW DESIGN//
+    backgroundImage: theme.mode === 'light' ? `url(${whatsBackground})` : `url(${whatsBackgroundDark})`,
     display: "flex",
     flexDirection: "column",
     flexGrow: 1,
@@ -53,7 +48,6 @@ const useStyles = makeStyles((theme) => ({
     overflowY: "scroll",
     ...theme.scrollbarStyles,
   },
-
   circleLoading: {
     color: green[500],
     position: "absolute",
@@ -62,7 +56,6 @@ const useStyles = makeStyles((theme) => ({
     left: "50%",
     marginTop: 12,
   },
-
   messageLeft: {
     marginRight: 20,
     marginTop: 2,
@@ -77,7 +70,6 @@ const useStyles = makeStyles((theme) => ({
       top: 0,
       right: 0,
     },
-
     whiteSpace: "pre-wrap",
     backgroundColor: "#ffffff",
     color: "#303030",
@@ -92,31 +84,6 @@ const useStyles = makeStyles((theme) => ({
     paddingBottom: 0,
     boxShadow: "0 1px 1px #b3b3b3",
   },
-
-  quotedContainerLeft: {
-    margin: "-3px -80px 6px -6px",
-    overflow: "hidden",
-    backgroundColor: "#f0f0f0",
-    borderRadius: "7.5px",
-    display: "flex",
-    position: "relative",
-  },
-
-  quotedMsg: {
-    padding: 10,
-    maxWidth: 300,
-    height: "auto",
-    display: "block",
-    whiteSpace: "pre-wrap",
-    overflow: "hidden",
-  },
-
-  quotedSideColorLeft: {
-    flex: "none",
-    width: "4px",
-    backgroundColor: "#6bcbef",
-  },
-
   messageRight: {
     marginLeft: 20,
     marginTop: 2,
@@ -131,7 +98,6 @@ const useStyles = makeStyles((theme) => ({
       top: 0,
       right: 0,
     },
-
     whiteSpace: "pre-wrap",
     backgroundColor: "#dcf8c6",
     color: "#303030",
@@ -146,62 +112,16 @@ const useStyles = makeStyles((theme) => ({
     paddingBottom: 0,
     boxShadow: "0 1px 1px #b3b3b3",
   },
-
-  quotedContainerRight: {
-    margin: "-3px -80px 6px -6px",
-    overflowY: "hidden",
-    backgroundColor: "#cfe9ba",
-    borderRadius: "7.5px",
-    display: "flex",
-    position: "relative",
-  },
-
-  quotedMsgRight: {
-    padding: 10,
-    maxWidth: 300,
-    height: "auto",
-    whiteSpace: "pre-wrap",
-  },
-
-  quotedSideColorRight: {
-    flex: "none",
-    width: "4px",
-    backgroundColor: "#35cd96",
-  },
-
-  messageActionsButton: {
-    display: "none",
-    position: "relative",
-    color: "#999",
-    zIndex: 1,
-    backgroundColor: "inherit",
-    opacity: "90%",
-    "&:hover, &.Mui-focusVisible": { backgroundColor: "inherit" },
-  },
-
-  messageContactName: {
-    display: "flex",
-    color: "#6bcbef",
-    fontWeight: 500,
-  },
-
   textContentItem: {
     overflowWrap: "break-word",
     padding: "3px 80px 6px 6px",
   },
-  
-  textContentItemEdited: {
-    overflowWrap: "break-word",
-    padding: "3px 120px 6px 6px",
-  },
-
   textContentItemDeleted: {
     fontStyle: "italic",
     color: "rgba(0, 0, 0, 0.36)",
     overflowWrap: "break-word",
     padding: "3px 80px 6px 6px",
   },
-
   messageMedia: {
     objectFit: "cover",
     width: 250,
@@ -211,7 +131,6 @@ const useStyles = makeStyles((theme) => ({
     borderBottomLeftRadius: 8,
     borderBottomRightRadius: 8,
   },
-
   timestamp: {
     fontSize: 11,
     position: "absolute",
@@ -219,7 +138,6 @@ const useStyles = makeStyles((theme) => ({
     right: 5,
     color: "#999",
   },
-
   dailyTimestamp: {
     alignItems: "center",
     textAlign: "center",
@@ -230,33 +148,28 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: "10px",
     boxShadow: "0 1px 1px #b3b3b3",
   },
-
   dailyTimestampText: {
     color: "#808888",
     padding: 8,
     alignSelf: "center",
     marginLeft: "0px",
   },
-
   ackIcons: {
     fontSize: 18,
     verticalAlign: "middle",
     marginLeft: 4,
   },
-
   deletedIcon: {
     fontSize: 18,
     verticalAlign: "middle",
     marginRight: 4,
   },
-
   ackDoneAllIcon: {
     color: green[500],
     fontSize: 18,
     verticalAlign: "middle",
     marginLeft: 4,
   },
-
   downloadMedia: {
     display: "flex",
     alignItems: "center",
@@ -490,7 +403,7 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
       return <DoneAll fontSize="small" className={classes.ackIcons} />;
     }
     if (message.ack === 4 || message.ack === 5) {
-      return <DoneAll fontSize="small" className={classes.ackDoneAllIcon} style
+      return <DoneAll fontSize="small" className={classes.ackDoneAllIcon} style={{color:'#0377FC'}} />;
     }
   };
 
@@ -537,7 +450,6 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
 
   const renderNumberTicket = (message, index) => {
     if (index < messagesList.length && index > 0) {
-
       let messageTicket = message.ticketId;
       let connectionName = message.ticket?.whatsapp?.name;
       let previousMessageTicket = messagesList[index - 1].ticketId;

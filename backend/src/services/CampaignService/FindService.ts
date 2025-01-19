@@ -5,15 +5,15 @@ import Whatsapp from "../../models/Whatsapp";
 import ContactList from "../../models/ContactList";
 
 interface FindServiceParams {
-  companyId: string;
+  companyId: string | number;
   searchParam?: string;
   status?: string;
-  pageNumber?: number;
-  pageSize?: number;
+  pageNumber?: string | number;
+  pageSize?: string | number;
 }
 
-interface FindServiceResult {
-  campaigns: Campaign[];
+export interface FindServiceResult {
+  records: Campaign[];
   count: number;
   hasMore: boolean;
 }
@@ -22,8 +22,8 @@ const FindService = async ({
   companyId,
   searchParam = '',
   status,
-  pageNumber = 1,
-  pageSize = 20
+  pageNumber = '1',
+  pageSize = '20'
 }: FindServiceParams): Promise<FindServiceResult> => {
   const whereCondition: any = {
     companyId
@@ -37,7 +37,10 @@ const FindService = async ({
     whereCondition.name = { [Op.like]: `%${searchParam}%` };
   }
 
-  const { count, rows: campaigns } = await Campaign.findAndCountAll({
+  const limit = parseInt(pageSize.toString(), 10);
+  const offset = (parseInt(pageNumber.toString(), 10) - 1) * limit;
+
+  const { count, rows: records } = await Campaign.findAndCountAll({
     where: whereCondition,
     include: [
       { 
@@ -55,17 +58,17 @@ const FindService = async ({
       }
     ],
     order: [["createdAt", "DESC"]],
-    limit: pageSize,
-    offset: (pageNumber - 1) * pageSize
+    limit,
+    offset
   });
 
-  const hasMore = count > pageNumber * pageSize;
+  const hasMore = count > offset + records.length;
 
   return {
-    campaigns,
+    records,
     count,
     hasMore
   };
 };
 
-export default FindService;
+export { FindService };

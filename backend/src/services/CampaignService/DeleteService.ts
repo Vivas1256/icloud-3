@@ -4,10 +4,7 @@ import Message from "../../models/Message";
 import AppError from "../../errors/AppError";
 
 const DeleteService = async (id: string): Promise<{ message: string }> => {
-  const record = await Campaign.findOne({
-    where: { id },
-    include: [{ model: Message, where: { status: "Programado" }, required: false }]
-  });
+  const record = await Campaign.findByPk(id);
 
   if (!record) {
     throw new AppError("ERR_NO_CAMPAIGN_FOUND", 404);
@@ -20,15 +17,13 @@ const DeleteService = async (id: string): Promise<{ message: string }> => {
     warningMessage = `Atención: La campaña con estado ${record.status} será eliminada.`;
   }
 
-  // Eliminar solo los mensajes programados asociados a la campaña
-  if (record.messages) {
-    await Message.destroy({
-      where: { 
-        campaignId: id,
-        status: "Programado"
-      }
-    });
-  }
+  // Eliminar los mensajes programados asociados a la campaña
+  await Message.destroy({
+    where: { 
+      campaignId: id,
+      status: "Programado"
+    }
+  });
 
   // Eliminar la campaña
   await record.destroy();

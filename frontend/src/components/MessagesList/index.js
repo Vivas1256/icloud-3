@@ -316,7 +316,6 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
   const classes = useStyles();
 
   const [messagesList, dispatch] = useReducer(reducer, []);
-  const [pageNumber, setPageNumber] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(false);
   const lastMessageRef = useRef();
@@ -330,41 +329,10 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
 
   useEffect(() => {
     dispatch({ type: "RESET" });
-    setPageNumber(1);
-
-    currentTicketId.current = ticketId;
-  }, [ticketId]);
-
-  useEffect(() => {
     setLoading(true);
-    const delayDebounceFn = setTimeout(() => {
-      const fetchMessages = async () => {
-        if (ticketId === undefined) return;
-        try {
-          const { data } = await api.get("/messages/" + ticketId, {
-            params: { pageNumber: 1, pageSize: 1000000 },
-          });
-
-          if (currentTicketId.current === ticketId) {
-            dispatch({ type: "LOAD_MESSAGES", payload: data.messages });
-            setHasMore(data.hasMore);
-            setLoading(false);
-          }
-
-          if (pageNumber === 1 && data.messages.length > 1) {
-            scrollToBottom();
-          }
-        } catch (err) {
-          setLoading(false);
-          toastError(err);
-        }
-      };
-      fetchMessages();
-    }, 500);
-    return () => {
-      clearTimeout(delayDebounceFn);
-    };
-  }, [pageNumber, ticketId]);
+    currentTicketId.current = ticketId;
+    fetchMessages();
+  }, [ticketId]);
 
   useEffect(() => {
     const companyId = localStorage.getItem("companyId");
@@ -388,8 +356,26 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
     };
   }, [ticketId, ticket, socketManager]);
 
-  const loadMore = () => {
-    setPageNumber((prevPageNumber) => prevPageNumber + 1);
+  const fetchMessages = async () => {
+    if (ticketId === undefined) return;
+    try {
+      const { data } = await api.get("/messages/" + ticketId, {
+        params: { pageNumber: 1, pageSize: 1000000 },
+      });
+
+      if (currentTicketId.current === ticketId) {
+        dispatch({ type: "LOAD_MESSAGES", payload: data.messages });
+        setHasMore(false);
+        setLoading(false);
+      }
+
+      if (data.messages.length > 1) {
+        scrollToBottom();
+      }
+    } catch (err) {
+      setLoading(false);
+      toastError(err);
+    }
   };
 
   const scrollToBottom = () => {
@@ -399,19 +385,9 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
   };
 
   const handleScroll = (e) => {
-    if (!hasMore) return;
     const { scrollTop } = e.currentTarget;
-
     if (scrollTop === 0) {
       document.getElementById("messagesList").scrollTop = 1;
-    }
-
-    if (loading) {
-      return;
-    }
-
-    if (scrollTop < 50) {
-      loadMore();
     }
   };
 
@@ -437,8 +413,7 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
 
       return <LocationPreview image={imageLocation} link={linkLocation} description={descriptionLocation} />
     }
-    else
-    if (message.mediaType === "contactMessage") {
+    else if (message.mediaType === "contactMessage") {
       let array = message.body.split("\n");
       let obj = [];
       let contact = "";
@@ -454,62 +429,19 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
           }
         }
       }
-      //console.log(array);
-      //console.log(contact);
-      //console.log(obj[0].number);
       return <VCardPreview contact={contact} numbers={obj[0].number} />
     }
-    /* else if (message.mediaType === "vcard") {
-      let array = message.body.split("\n");
-      let obj = [];
-      let contact = "";
-      for (let index = 0; index < array.length; index++) {
-        const v = array[index];
-        let values = v.split(":");
-        for (let ind = 0; ind < values.length; ind++) {
-          if (values[ind].indexOf("+") !== -1) {
-            obj.push({ number: values[ind] });
-          }
-          if (values[ind].indexOf("FN") !== -1) {
-            contact = values[ind + 1];
-          }
-        }
-      }
-      return <VcardPreview contact={contact} numbers={obj[0].number} />
-    } */
-    /*else if (message.mediaType === "multi_vcard") {
-      console.log("multi_vcard")
-      console.log(message)
-      
-      if(message.body !== null && message.body !== "") {
-        let newBody = JSON.parse(message.body)
-        return (
-          <>
-            {
-            newBody.map(v => (
-              <VcardPreview contact={v.name} numbers={v.number} />
-            ))
-            }
-          </>
-        )
-      } else return (<></>)
-    }*/
     else if (message.mediaType === "image") {
       return <ModalImageCors imageUrl={message.mediaUrl} />;
     } else if (message.mediaType === "audio") {
-
-      //console.log(isIOS);
-
       if (isIOS) {
         message.mediaUrl = message.mediaUrl.replace("ogg", "mp3");
-
         return (
           <audio controls>
             <source src={message.mediaUrl} type="audio/mp3"></source>
           </audio>
         );
       } else {
-
         return (
           <audio controls>
             <source src={message.mediaUrl} type="audio/ogg"></source>
@@ -542,42 +474,25 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
         </>
       );
     }
-};
+  };
 
-  /*
-    const renderMessageAck = (message) => {
-      if (message.ack === 1) {
-        return <AccessTime fontSize="small" className={classes.ackIcons} />;
-      }
-      if (message.ack === 2) {
-        return <Done fontSize="small" className={classes.ackIcons} />;
-      }
-      if (message.ack === 3) {
-        return <DoneAll fontSize="small" className={classes.ackIcons} />;
-      }
-      if (message.ack === 4 || message.ack === 5) {
-        return <DoneAll fontSize="small" className={classes.ackDoneAllIcon} />;
-      }
-    };
-    */
-
-    const renderMessageAck = (message) => {
-      if (message.ack === 0) {
-        return <AccessTime fontSize="small" className={classes.ackIcons} />;
-      }
-      if (message.ack === 1) {
-        return <Done fontSize="small" className={classes.ackIcons} />;
-      }
-      if (message.ack === 2) {
-        return <Done fontSize="small" className={classes.ackIcons} />;
-      }
-      if (message.ack === 3) {
-        return <DoneAll fontSize="small" className={classes.ackIcons} />;
-      }
-      if (message.ack === 4 || message.ack === 5) {
-        return <DoneAll fontSize="small" className={classes.ackDoneAllIcon} style={{color:'#0377FC'}} />;
-      }
-    };
+  const renderMessageAck = (message) => {
+    if (message.ack === 0) {
+      return <AccessTime fontSize="small" className={classes.ackIcons} />;
+    }
+    if (message.ack === 1) {
+      return <Done fontSize="small" className={classes.ackIcons} />;
+    }
+    if (message.ack === 2) {
+      return <Done fontSize="small" className={classes.ackIcons} />;
+    }
+    if (message.ack === 3) {
+      return <DoneAll fontSize="small" className={classes.ackIcons} />;
+    }
+    if (message.ack === 4 || message.ack === 5) {
+      return <DoneAll fontSize="small" className={classes.ackDoneAllIcon} style
+    }
+  };
 
   const renderDailyTimestamps = (message, index) => {
     if (index === 0) {
@@ -675,44 +590,37 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
             </span>
           )}
 
-          {message.quotedMsg.mediaType === "audio"
-            && (
-              <div className={classes.downloadMedia}>
-                <audio controls>
-                  <source src={message.quotedMsg.mediaUrl} type="audio/ogg"></source>
-                </audio>
-              </div>
-            )
-          }
-          {message.quotedMsg.mediaType === "video"
-            && (
-              <video
-                className={classes.messageMedia}
-                src={message.quotedMsg.mediaUrl}
-                controls
-              />
-            )
-          }
-          {message.quotedMsg.mediaType === "application"
-            && (
-              <div className={classes.downloadMedia}>
-                <Button
-                  startIcon={<GetApp />}
-                  color="primary"
-                  variant="outlined"
-                  target="_blank"
-                  href={message.quotedMsg.mediaUrl}
-                >
-                  Download
-                </Button>
-              </div>
-            )
-          }
+          {message.quotedMsg.mediaType === "audio" && (
+            <div className={classes.downloadMedia}>
+              <audio controls>
+                <source src={message.quotedMsg.mediaUrl} type="audio/ogg"></source>
+              </audio>
+            </div>
+          )}
+          {message.quotedMsg.mediaType === "video" && (
+            <video
+              className={classes.messageMedia}
+              src={message.quotedMsg.mediaUrl}
+              controls
+            />
+          )}
+          {message.quotedMsg.mediaType === "application" && (
+            <div className={classes.downloadMedia}>
+              <Button
+                startIcon={<GetApp />}
+                color="primary"
+                variant="outlined"
+                target="_blank"
+                href={message.quotedMsg.mediaUrl}
+              >
+                Download
+              </Button>
+            </div>
+          )}
 
           {message.quotedMsg.mediaType === "image"
-            && (
-              <ModalImageCors imageUrl={message.quotedMsg.mediaUrl} />)
-            || message.quotedMsg?.body}
+            ? <ModalImageCors imageUrl={message.quotedMsg.mediaUrl} />
+            : message.quotedMsg?.body}
 
         </div>
       </div>
@@ -778,7 +686,6 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
                   </span>
                 )}
 
-                {/* aviso de mensagem apagado pelo contato */}
                 {message.isDeleted && (
                   <div>
                     <span className={"message-deleted"}
@@ -792,9 +699,7 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
                   </div>
                 )}
 
-                {(message.mediaUrl || message.mediaType === "locationMessage" || message.mediaType === "vcard" || message.mediaType === "contactMessage"
-                  //|| message.mediaType === "multi_vcard" 
-                ) && checkMessageMedia(message)}
+                {(message.mediaUrl || message.mediaType === "locationMessage" || message.mediaType === "vcard" || message.mediaType === "contactMessage") && checkMessageMedia(message)}
                 <div className={classes.textContentItem}>
                   {message.quotedMsg && renderQuotedMessage(message)}
                   <MarkdownWrapper>
@@ -824,9 +729,7 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
                 >
                   <ExpandMore />
                 </IconButton>
-                {(message.mediaUrl || message.mediaType === "locationMessage" || message.mediaType === "vcard" || message.mediaType === "contactMessage"
-                  //|| message.mediaType === "multi_vcard" 
-                ) && checkMessageMedia(message)}
+                {(message.mediaUrl || message.mediaType === "locationMessage" || message.mediaType === "vcard" || message.mediaType === "contactMessage") && checkMessageMedia(message)}
                 <div
                   className={clsx(classes.textContentItem, {
                     [classes.textContentItemDeleted]: message.isDeleted,

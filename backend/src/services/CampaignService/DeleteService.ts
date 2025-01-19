@@ -3,7 +3,7 @@ import Campaign from "../../models/Campaign";
 import Message from "../../models/Message";
 import AppError from "../../errors/AppError";
 
-const DeleteService = async (id: string): Promise<{ message: string }> => {
+export const DeleteService = async (id: string): Promise<{ message: string }> => {
   const record = await Campaign.findByPk(id);
 
   if (!record) {
@@ -43,7 +43,7 @@ const DeleteService = async (id: string): Promise<{ message: string }> => {
 };
 
 // Función para manejar la solicitud HTTP
-const handleDeleteCampaign = async (req: Request, res: Response): Promise<Response> => {
+export const handleDeleteCampaign = async (req: Request, res: Response): Promise<Response> => {
   try {
     const { id } = req.params;
     const result = await DeleteService(id);
@@ -55,5 +55,3 @@ const handleDeleteCampaign = async (req: Request, res: Response): Promise<Respon
     return res.status(500).json({ error: "Internal server error" });
   }
 };
-
-export { DeleteService, handleDeleteCampaign };

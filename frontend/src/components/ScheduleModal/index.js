@@ -86,10 +86,18 @@ const ScheduleModal = ({ open, onClose, scheduleId, contactId, cleanContact, rel
     const attachmentFile = useRef(null);
     const [confirmationOpen, setConfirmationOpen] = useState(false);
     const messageInputRef = useRef();
-    const [userTimeZone, setUserTimeZone] = useState(moment.tz.guess());
+    const [scheduledMessages, setScheduledMessages] = useState([]);
 
     useEffect(() => {
-        setUserTimeZone(moment.tz.guess());
+        if (contactId && contacts.length) {
+            const contact = contacts.find(c => c.id === contactId);
+            if (contact) {
+                setCurrentContact(contact);
+            }
+        }
+    }, [contactId, contacts]);
+
+    useEffect(() => {
         const { companyId } = user;
         if (open) {
             try {
@@ -109,15 +117,25 @@ const ScheduleModal = ({ open, onClose, scheduleId, contactId, cleanContact, rel
 
                     const { data } = await api.get(`/schedules/${scheduleId}`);
                     setSchedule(prevState => {
-                        return { ...prevState, ...data, sendAt: moment(data.sendAt).tz(userTimeZone).format('YYYY-MM-DDTHH:mm') };
+                        return { ...prevState, ...data, sendAt: moment(data.sendAt).format('YYYY-MM-DDTHH:mm') };
                     });
                     setCurrentContact(data.contact);
+                    fetchScheduledMessages();
                 })()
             } catch (err) {
                 toastError(err);
             }
         }
-    }, [scheduleId, contactId, open, user, userTimeZone]);
+    }, [scheduleId, contactId, open, user]);
+
+    const fetchScheduledMessages = async () => {
+        try {
+            const { data } = await api.get(`/schedules/campaign/${scheduleId}`);
+            setScheduledMessages(data);
+        } catch (err) {
+            toastError(err);
+        }
+    };
 
     const handleClose = () => {
         onClose();
@@ -133,8 +151,8 @@ const ScheduleModal = ({ open, onClose, scheduleId, contactId, cleanContact, rel
     };
 
     const handleSaveSchedule = async values => {
-        const utcSendAt = moment.tz(values.sendAt, userTimeZone).utc().format();
-        const scheduleData = { ...values, sendAt: utcSendAt, userId: user.id };
+        const sendAtWithOffset = moment.tz(values.sendAt, moment.tz.guess()).utc().format();
+        const scheduleData = { ...values, sendAt: sendAtWithOffset, userId: user.id };
 
         try {
             if (scheduleId) {
@@ -201,6 +219,30 @@ const ScheduleModal = ({ open, onClose, scheduleId, contactId, cleanContact, rel
         }
     };
 
+    const handleEdit = () => {
+        // Implementa la lógica de edición aquí
+    };
+
+    const handlePause = async () => {
+        try {
+            await api.post(`/schedules/${scheduleId}/pause`);
+            toast.success(i18n.t("scheduleModal.success.pause"));
+            if (typeof reload === 'function') reload();
+        } catch (err) {
+            toastError(err);
+        }
+    };
+
+    const handleResume = async () => {
+        try {
+            await api.post(`/schedules/${scheduleId}/resume`);
+            toast.success(i18n.t("scheduleModal.success.resume"));
+            if (typeof reload === 'function') reload();
+        } catch (err) {
+            toastError(err);
+        }
+    };
+
     return (
         <div className={classes.root}>
             <ConfirmationModal
@@ -221,6 +263,23 @@ const ScheduleModal = ({ open, onClose, scheduleId, contactId, cleanContact, rel
                 <DialogTitle id="form-dialog-title">
                     {schedule.status === 'ERRO' ? 'Erro de Envio' : `Mensagem ${capitalize(schedule.status)}`}
                 </DialogTitle>
+                {scheduleId && (
+                    <div>
+                        <Button onClick={handleEdit}>
+                            {i18n.t("scheduleModal.buttons.edit")}
+                        </Button>
+                        {schedule.status === 'PENDING' && (
+                            <Button onClick={handlePause}>
+                                {i18n.t("scheduleModal.buttons.pause")}
+                            </Button>
+                        )}
+                        {schedule.status === 'PAUSED' && (
+                            <Button onClick={handleResume}>
+                                {i18n.t("scheduleModal.buttons.resume")}
+                            </Button>
+                        )}
+                    </div>
+                )}
                 <div style={{ display: "none" }}>
                     <input
                         type="file"
@@ -301,11 +360,6 @@ const ScheduleModal = ({ open, onClose, scheduleId, contactId, cleanContact, rel
                                         helperText={touched.sendAt && errors.sendAt}
                                         variant="outlined"
                                         fullWidth
-                                        value={moment(values.sendAt).tz(userTimeZone).format('YYYY-MM-DDTHH:mm')}
-                                        onChange={(e) => {
-                                            const localDate = moment(e.target.value).tz(userTimeZone);
-                                            setFieldValue('sendAt', localDate.format('YYYY-MM-DDTHH:mm'));
-                                        }}
                                     />
                                 </div>
                                 {(schedule.mediaPath || attachment) && (
@@ -320,6 +374,17 @@ const ScheduleModal = ({ open, onClose, scheduleId, contactId, cleanContact, rel
                                             <DeleteOutline color="secondary" />
                                         </IconButton>
                                     </Grid>
+                                )}
+                                {scheduledMessages.length > 0 && (
+                                    <div>
+                                        <h3>{i18n.t("scheduleModal.scheduledMessages")}</h3>
+                                        {scheduledMessages.map((message, index) => (
+                                            <div key={index}>
+                                                <p>{message.body}</p>
+                                                <p>{moment(message.sendAt).format('YYYY-MM-DD HH:mm')}</p>
+                                            </div>
+                                        ))}
+                                    </div>
                                 )}
                             </DialogContent>
                             <DialogActions>
@@ -349,7 +414,7 @@ const ScheduleModal = ({ open, onClose, scheduleId, contactId, cleanContact, rel
                                         variant="contained"
                                         className={classes.btnWrapper}
                                     >
-                                        {scheduleId
+                                     {scheduleId
                                             ? `${i18n.t("scheduleModal.buttons.okEdit")}`
                                             : `${i18n.t("scheduleModal.buttons.okAdd")}`}
                                         {isSubmitting && (

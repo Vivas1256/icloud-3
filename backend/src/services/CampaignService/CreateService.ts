@@ -3,6 +3,7 @@ import AppError from "../../errors/AppError";
 import Campaign from "../../models/Campaign";
 import ContactList from "../../models/ContactList";
 import Whatsapp from "../../models/Whatsapp";
+import Message from "../../models/Message";
 
 interface Data {
   name: string;
@@ -22,19 +23,25 @@ interface Data {
   confirmationMessage4?: string;
   confirmationMessage5?: string;
   fileListId: number;
+  file1?: string;
+  file2?: string;
+  file3?: string;
+  file4?: string;
+  file5?: string;
 }
 
 const CreateService = async (data: Data): Promise<Campaign> => {
-  const { name } = data;
+  const { name, message1 } = data;
 
-  const ticketnoteSchema = Yup.object().shape({
+  const campaignSchema = Yup.object().shape({
     name: Yup.string()
       .min(3, "ERR_CAMPAIGN_INVALID_NAME")
-      .required("ERR_CAMPAIGN_REQUIRED")
+      .required("ERR_CAMPAIGN_REQUIRED"),
+    message1: Yup.string().required("ERR_CAMPAIGN_MESSAGE_REQUIRED"),
   });
 
   try {
-    await ticketnoteSchema.validate({ name });
+    await campaignSchema.validate({ name, message1 });
   } catch (err: any) {
     throw new AppError(err.message);
   }
@@ -45,10 +52,30 @@ const CreateService = async (data: Data): Promise<Campaign> => {
 
   const record = await Campaign.create(data);
 
+  // Crear mensajes programados
+  const messages = [
+    { body: data.message1, file: data.file1 },
+    { body: data.message2, file: data.file2 },
+    { body: data.message3, file: data.file3 },
+    { body: data.message4, file: data.file4 },
+    { body: data.message5, file: data.file5 }
+  ].filter(msg => msg.body || msg.file);
+
+  for (let i = 0; i < messages.length; i++) {
+    await Message.create({
+      body: messages[i].body,
+      mediaUrl: messages[i].file,
+      campaignId: record.id,
+      scheduledAt: data.scheduledAt ? new Date(new Date(data.scheduledAt).getTime() + i * 60000) : null, // Añade 1 minuto por cada mensaje
+      status: "Programado"
+    });
+  }
+
   await record.reload({
     include: [
       { model: ContactList },
-      { model: Whatsapp, attributes: ["id", "name"] }
+      { model: Whatsapp, attributes: ["id", "name"] },
+      { model: Message, where: { status: "Programado" }, required: false }
     ]
   });
 

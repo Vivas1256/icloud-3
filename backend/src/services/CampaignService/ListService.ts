@@ -8,6 +8,8 @@ interface Request {
   companyId: number | string;
   searchParam?: string;
   pageNumber?: string;
+  status?: string;
+  pageSize?: string;
 }
 
 interface Response {
@@ -19,11 +21,17 @@ interface Response {
 const ListService = async ({
   searchParam = "",
   pageNumber = "1",
-  companyId
+  pageSize = "20",
+  companyId,
+  status
 }: Request): Promise<Response> => {
   let whereCondition: any = {
     companyId
   };
+
+  if (status) {
+    whereCondition.status = status;
+  }
 
   if (!isEmpty(searchParam)) {
     whereCondition = {
@@ -40,16 +48,16 @@ const ListService = async ({
     };
   }
 
-  const limit = 20;
-  const offset = limit * (+pageNumber - 1);
+  const limit = parseInt(pageSize, 10);
+  const offset = limit * (parseInt(pageNumber, 10) - 1);
 
   const { count, rows: records } = await Campaign.findAndCountAll({
     where: whereCondition,
     limit,
     offset,
-    order: [["name", "ASC"]],
+    order: [["createdAt", "DESC"]],
     include: [
-      { model: ContactList },
+      { model: ContactList, attributes: ["id", "name"] },
       { model: Whatsapp, attributes: ["id", "name"] }
     ]
   });

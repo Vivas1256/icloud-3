@@ -231,7 +231,7 @@ const SignUp = () => {
 											variant="outlined"
 											fullWidth
 											label="Indicativo pais y numero de Whatsapp"
-											inputProps={{ maxLength: 12 }} // Definindo o limite de caracteres
+											inputProps={{ maxLength: 13 }} // Definindo o limite de caracteres
 										/>
 									)}
 								</Field>

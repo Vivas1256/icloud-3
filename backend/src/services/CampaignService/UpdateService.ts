@@ -2,9 +2,9 @@ import AppError from "../../errors/AppError";
 import Campaign from "../../models/Campaign";
 import ContactList from "../../models/ContactList";
 import Whatsapp from "../../models/Whatsapp";
+import Message from "../../models/Message";
 import * as Yup from 'yup';
 import { Op } from 'sequelize';
-import Message from "../../models/Message";
 
 interface UpdateData {
   id: number | string;
@@ -29,11 +29,10 @@ interface UpdateData {
 
 const updateSchema = Yup.object().shape({
   name: Yup.string().min(3, "Nombre demasiado corto"),
-  status: Yup.string().oneOf(['INACTIVA', 'PROGRAMADA', 'EN PROCESO', 'CANCELADA', 'FINALIZADA'], "Status inválido"),
+  status: Yup.string().oneOf(['INACTIVA', 'PROGRAMADA', 'EN PROCESO', 'PAUSADA', 'CANCELADA', 'FINALIZADA'], "Status inválido"),
   scheduledAt: Yup.date().nullable(),
-  contactListId: Yup.number().positive("ID da lista de contatos inválido"),
-  message1: Yup.string(),
-  // ... adicione validações para outros campos conforme necessário
+  contactListId: Yup.number().positive("ID de lista de contactos inválido"),
+  // ... añadir validaciones para otros campos según sea necesario
 });
 
 const UpdateService = async (data: UpdateData): Promise<Campaign> => {
@@ -53,43 +52,47 @@ const UpdateService = async (data: UpdateData): Promise<Campaign> => {
 
   const originalStatus = campaign.status;
 
-  // Si la campaña estaba en progreso y se está actualizando, pausarla
-  if (originalStatus === 'EN PROCESO' && data.status !== 'EN PROCESO') {
+  // Si la campaña se está pausando
+  if (originalStatus === 'EN PROCESO' && data.status === 'PAUSADA') {
     await Message.update(
       { status: 'PENDIENTE' },
-      { where: { campaignId: id, status: 'PROGRAMADO' } }
-    );
-    data.status = 'PROGRAMADA';
-  }
-
-  // Actualizar la campaña
-  await campaign.update(data);
-
-  // Si la campaña se está reanudando, actualizar los mensajes pendientes
-  if (originalStatus !== 'EN PROCESO' && data.status === 'EN PROCESO') {
-    await Message.update(
-      { 
-        body: data.message1, // Actualizar con el nuevo mensaje
-        status: 'PROGRAMADO'
-      },
       { 
         where: { 
           campaignId: id, 
-          status: 'PENDIENTE',
-          scheduledAt: { [Op.gt]: new Date() } // Solo actualizar mensajes futuros
+          status: 'PROGRAMADO',
+          scheduledAt: { [Op.gt]: new Date() } // Solo pausar mensajes futuros
         } 
       }
     );
   }
 
-  await campaign.reload({
+  // Si la campaña se está reanudando
+  if (originalStatus === 'PAUSADA' && data.status === 'EN PROCESO') {
+    await Message.update(
+      { status: 'PROGRAMADO' },
+      { 
+        where: { 
+          campaignId: id, 
+          status: 'PENDIENTE' 
+        } 
+      }
+    );
+  }
+
+  // Actualizar la campaña conservando los datos existentes
+  const updatedCampaign = await campaign.update({
+    ...campaign.toJSON(),
+    ...data
+  });
+
+  await updatedCampaign.reload({
     include: [
       { model: ContactList },
       { model: Whatsapp, attributes: ["id", "name"] }
     ]
   });
 
-  return campaign;
+  return updatedCampaign;
 };
 
 export default UpdateService;

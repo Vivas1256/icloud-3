@@ -315,7 +315,7 @@ const ScheduleModal = ({ open, onClose, scheduleId, contactId, cleanContact, rel
                     }}
                     inputProps={{
                       step: 60, // 1 minuto
-                      min: moment().add(5, 'minutes').format('YYYY-MM-DDTHH:mm')
+                      min: moment().add(1, 'minutes').format('YYYY-MM-DDTHH:mm')
                     }}
                     error={touched.sendAt && Boolean(errors.sendAt)}
                     helperText={touched.sendAt && errors.sendAt ? errors.sendAt : `Hora local: ${moment(values.sendAt).format('YYYY-MM-DD HH:mm')}`}

@@ -63,7 +63,7 @@ const CampaignSchema = Yup.object().shape({
   status: Yup.string().oneOf(['Inactiva', 'PROGRAMADA', 'Proceso', 'PAUSADA', 'CANCELADA', 'FINALIZADA'], "Estado inválido"),
   whatsappId: Yup.string().required("WhatsApp is required"),
   scheduledAt: Yup.date()
-    .min(moment().add(5, 'minutes'), "La fecha debe ser al menos 5 minutos en el futuro")
+    .min(moment().add(1, 'minutes'), "La fecha debe ser al menos 1 minutos en el futuro")
     .required("La fecha es requerida"),
 });
 
@@ -392,6 +392,26 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                           variant="outlined"
                           error={touched.tagListId && Boolean(errors.tagListId)}
                           helperText={touched.tagListId && errors.tagListId}
+                        />
+                      )}
+                      disabled={!campaignEditable}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={4}>
+                    <Autocomplete
+                      options={memoizedWhatsapps}
+                      getOptionLabel={(option) => option.name}
+                      value={memoizedWhatsapps.find(whatsapp => whatsapp.id === values.whatsappId) || null}
+                      onChange={(e, newValue) => {
+                        setFieldValue("whatsappId", newValue ? newValue.id : "");
+                      }}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label={i18n.t("campaigns.dialog.form.whatsapp")}
+                          variant="outlined"
+                          error={touched.whatsappId && Boolean(errors.whatsappId)}
+                          helperText={touched.whatsappId && errors.whatsappId}
                         />
                       )}
                       disabled={!campaignEditable}

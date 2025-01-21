@@ -7,14 +7,7 @@ import { logger } from "../../utils/logger";
 const DeleteService = async (id: string): Promise<void> => {
   try {
     const record = await Campaign.findOne({
-      where: { id },
-      include: [
-        {
-          model: Message,
-          where: { status: { [Op.ne]: "ENVIADO" } },
-          required: false
-        }
-      ]
+      where: { id }
     });
 
     if (!record) {
@@ -25,8 +18,12 @@ const DeleteService = async (id: string): Promise<void> => {
       throw new AppError("ERR_DELETE_RUNNING_CAMPAIGN", 400);
     }
 
-    // Check if there are any scheduled messages
-    if (record.Messages && record.Messages.length > 0) {
+    // Check if there are any associated messages
+    const associatedMessages = await Message.findOne({
+      where: { campaignId: id, status: { [Op.ne]: "ENVIADO" } }
+    });
+
+    if (associatedMessages) {
       // Delete associated messages
       await Message.destroy({ where: { campaignId: id } });
     }

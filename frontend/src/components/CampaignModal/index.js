@@ -192,7 +192,6 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
           .catch(error => {
             console.error("Error fetching campaign data:", error);
             toast.error(i18n.t("campaigns.fetchCampaignError"));
-            setCampaign((prev) => ({ ...prev }));
           });
       }
     }
@@ -228,9 +227,14 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
       const dataValues = {};
       Object.entries(values).forEach(([key, value]) => {
         if (key === "scheduledAt" && value !== "" && value !== null) {
-          // Convertir la hora local a UTC
-          const localTime = moment(value);
-          const utcTime = localTime.utc().format("YYYY-MM-DD HH:mm:ss");
+          const scheduledTime = moment(value);
+          const now = moment();
+          
+          if (scheduledTime.isBefore(now)) {
+            throw new Error("La fecha programada no puede estar en el pasado");
+          }
+          
+          const utcTime = scheduledTime.utc().format("YYYY-MM-DD HH:mm:00");
           dataValues[key] = utcTime;
         } else {
           dataValues[key] = value === "" ? null : value;
@@ -467,22 +471,25 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                     />
                   </Grid>
                   <Grid xs={12} md={4} item>
-                    <Field
-                      as={TextField}
-                      label={i18n.t("campaigns.dialog.form.scheduledAt")}
-                      name="scheduledAt"
-                      error={touched.scheduledAt && Boolean(errors.scheduledAt)}
-                      helperText={touched.scheduledAt && errors.scheduledAt}
-                      variant="outlined"
-                      margin="dense"
-                      type="datetime-local"
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
-                      fullWidth
-                      className={classes.textField}
-                      disabled={!campaignEditable}
-                    />
+                  <Field
+                  as={TextField}
+                  label={i18n.t("campaigns.dialog.form.scheduledAt")}
+                  name="scheduledAt"
+                  error={touched.scheduledAt && Boolean(errors.scheduledAt)}
+                  helperText={touched.scheduledAt && errors.scheduledAt}
+                  variant="outlined"
+                  margin="dense"
+                  type="datetime-local"
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  inputProps={{
+                    min: moment().format("YYYY-MM-DDTHH:mm"),
+                  }}
+                  fullWidth
+                className={classes.textField}
+                  disabled={!campaignEditable}
+                />
                   </Grid>
                   <Grid xs={12} md={4} item>
                     <Autocomplete

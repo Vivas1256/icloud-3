@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useRef, useState, useMemo } from "react";
 import { Field, Form, Formik } from "formik";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
-import moment from "moment";
+import moment from "moment-timezone";
 import {
   Button,
   CircularProgress,
@@ -62,7 +62,9 @@ const CampaignSchema = Yup.object().shape({
     .required("Required"),
   status: Yup.string().oneOf(['Inactiva', 'PROGRAMADA', 'Proceso', 'PAUSADA', 'CANCELADA', 'FINALIZADA'], "Estado inválido"),
   whatsappId: Yup.string().required("WhatsApp is required"),
-  scheduledAt: Yup.date().min(new Date(), "Scheduled date must be in the future"),
+  scheduledAt: Yup.date()
+    .min(moment().add(5, 'minutes'), "La fecha debe ser al menos 5 minutos en el futuro")
+    .required("La fecha es requerida"),
 });
 
 const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, resetPagination }) => {
@@ -154,23 +156,24 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
           console.error("Error retrieving tags:", error);
         });
         
-      if (!campaignId) return;
+      if (campaignId) {
+        api.get(`/campaigns/${campaignId}`).then(({ data }) => {
+          setCampaign((prev) => {
+            let prevCampaignData = { ...prev };
 
-      api.get(`/campaigns/${campaignId}`).then(({ data }) => {
-        setCampaign((prev) => {
-          let prevCampaignData = Object.assign({}, prev);
+            Object.entries(data).forEach(([key, value]) => {
+              if (key === "scheduledAt" && value !== "" && value !== null) {
+                // Convertir UTC a hora local
+                prevCampaignData[key] = moment.utc(value).local().format("YYYY-MM-DDTHH:mm");
+              } else {
+                prevCampaignData[key] = value === null ? "" : value;
+              }
+            });
 
-          Object.entries(data).forEach(([key, value]) => {
-            if (key === "scheduledAt" && value !== "" && value !== null) {
-              prevCampaignData[key] = moment(value).format("YYYY-MM-DDTHH:mm");
-            } else {
-              prevCampaignData[key] = value === null ? "" : value;
-            }
+            return prevCampaignData;
           });
-
-          return prevCampaignData;
         });
-      });
+      }
     }
   }, [campaignId, initialValues, companyId]);
 
@@ -203,7 +206,8 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
       const dataValues = {};
       Object.entries(values).forEach(([key, value]) => {
         if (key === "scheduledAt" && value !== "" && value !== null) {
-          dataValues[key] = moment(value).format("YYYY-MM-DD HH:mm:ss");
+          // Convertir la hora local a UTC
+          dataValues[key] = moment.tz(value, moment.tz.guess()).utc().format("YYYY-MM-DD HH:mm:ss");
         } else {
           dataValues[key] = value === "" ? null : value;
         }
@@ -394,26 +398,6 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                     />
                   </Grid>
                   <Grid item xs={12} md={4}>
-                    <Autocomplete
-                      options={memoizedWhatsapps}
-                      getOptionLabel={(option) => option.name}
-                      value={memoizedWhatsapps.find(whatsapp => whatsapp.id === values.whatsappId) || null}
-                      onChange={(e, newValue) => {
-                        setFieldValue("whatsappId", newValue ? newValue.id : "");
-                      }}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label={i18n.t("campaigns.dialog.form.whatsapp")}
-                          variant="outlined"
-                          error={touched.whatsappId && Boolean(errors.whatsappId)}
-                          helperText={touched.whatsappId && errors.whatsappId}
-                        />
-                      )}
-                      disabled={!campaignEditable}
-                    />
-                  </Grid>
-                  <Grid item xs={12} md={4}>
                     <Field
                       as={TextField}
                       label={i18n.t("campaigns.dialog.form.scheduledAt")}
@@ -421,6 +405,9 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                       type="datetime-local"
                       InputLabelProps={{
                         shrink: true,
+                      }}
+                      inputProps={{
+                        step: 60, // 1 minuto
                       }}
                       error={touched.scheduledAt && Boolean(errors.scheduledAt)}
                       helperText={touched.scheduledAt && errors.scheduledAt}

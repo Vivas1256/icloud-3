@@ -63,7 +63,7 @@ const ScheduleSchema = Yup.object().shape({
     .required("Obrigatório"),
   contactId: Yup.number().required("Obrigatório"),
   sendAt: Yup.date()
-    .min(moment().add(5, 'minutes'), "A data deve ser pelo menos 5 minutos no futuro")
+    .min(moment().add(1, 'minutes'), "A data deve ser pelo menos 5 minutos no futuro")
     .required("Obrigatório")
 });
 
@@ -76,7 +76,7 @@ const ScheduleModal = ({ open, onClose, scheduleId, contactId, cleanContact, rel
   const initialState = {
     body: "",
     contactId: "",
-    sendAt: moment().add(30, 'minutes').format('YYYY-MM-DDTHH:mm'),
+    sendAt: moment().add(1, 'minutes').format('YYYY-MM-DDTHH:mm'),
     sentAt: "",
     timezone: userTimezone
   };

@@ -76,7 +76,7 @@ const ScheduleModal = ({ open, onClose, scheduleId, contactId, cleanContact, rel
   const initialState = {
     body: "",
     contactId: "",
-    sendAt: moment().add(1, 'minutes').format('YYYY-MM-DDTHH:mm'),
+    sendAt: moment().add(30, 'minutes').format('YYYY-MM-DDTHH:mm'),
     sentAt: "",
     timezone: userTimezone
   };
@@ -110,17 +110,18 @@ const ScheduleModal = ({ open, onClose, scheduleId, contactId, cleanContact, rel
 
       if (scheduleId) {
         const { data } = await api.get(`/schedules/${scheduleId}`);
+        const localSendAt = moment.utc(data.sendAt).tz(userTimezone);
         setSchedule(prevState => ({
           ...prevState,
           ...data,
-          sendAt: moment.tz(data.sendAt, data.timezone).local().format('YYYY-MM-DDTHH:mm')
+          sendAt: localSendAt.format('YYYY-MM-DDTHH:mm')
         }));
         setCurrentContact(data.contact);
       }
     } catch (err) {
       toastError(err);
     }
-  }, [user, contactId, scheduleId]);
+  }, [user, contactId, scheduleId, userTimezone]);
 
   useEffect(() => {
     if (open) {
@@ -151,9 +152,12 @@ const ScheduleModal = ({ open, onClose, scheduleId, contactId, cleanContact, rel
   };
 
   const handleSaveSchedule = async values => {
+    const localSendAt = moment.tz(values.sendAt, userTimezone);
+    const utcSendAt = localSendAt.utc();
+
     const scheduleData = {
       ...values,
-      sendAt: moment.tz(values.sendAt, userTimezone).utc().format(),
+      sendAt: utcSendAt.format(),
       timezone: userTimezone,
       userId: user.id
     };
@@ -314,7 +318,7 @@ const ScheduleModal = ({ open, onClose, scheduleId, contactId, cleanContact, rel
                       min: moment().add(5, 'minutes').format('YYYY-MM-DDTHH:mm')
                     }}
                     error={touched.sendAt && Boolean(errors.sendAt)}
-                    helperText={touched.sendAt && errors.sendAt}
+                    helperText={touched.sendAt && errors.sendAt ? errors.sendAt : `Hora local: ${moment(values.sendAt).format('YYYY-MM-DD HH:mm')}`}
                     variant="outlined"
                     fullWidth
                   />

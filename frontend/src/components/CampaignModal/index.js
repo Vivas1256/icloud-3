@@ -3,7 +3,6 @@ import { Field, Form, Formik } from "formik";
 import { head } from "lodash";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
-import moment from "moment";
 import {
   Button,
   CircularProgress,
@@ -27,6 +26,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { AttachFile as AttachFileIcon, DeleteOutline as DeleteOutlineIcon } from "@material-ui/icons";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import PropTypes from 'prop-types';
+import moment from 'moment-timezone';
 
 import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
@@ -166,32 +166,38 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
           return { ...prevState, ...initialValues };
         });
       }
-
+  
       fetchInitialData();
       
       if (campaignId) {
-        api.get(`/campaigns/${campaignId}`).then(({ data }) => {
-          setCampaign((prev) => {
-            let prevCampaignData = Object.assign({}, prev);
-
-            Object.entries(data).forEach(([key, value]) => {
-              if (key === "scheduledAt" && value !== "" && value !== null) {
-                prevCampaignData[key] = moment(value).format("YYYY-MM-DDTHH:mm");
-              } else {
-                prevCampaignData[key] = value === null ? "" : value;
-              }
+        api.get(`/campaigns/${campaignId}`)
+          .then(({ data }) => {
+            setCampaign((prev) => {
+              let prevCampaignData = { ...prev };
+  
+              Object.entries(data).forEach(([key, value]) => {
+                if (key === "scheduledAt" && value !== "" && value !== null) {
+                  // Convertir UTC a hora local
+                  const utcTime = moment.utc(value);
+                  const localTime = utcTime.local().format("YYYY-MM-DDTHH:mm");
+                  prevCampaignData[key] = localTime;
+                } else {
+                  prevCampaignData[key] = value === null ? "" : value;
+                }
+              });
+  
+              return prevCampaignData;
             });
-
-            return prevCampaignData;
+          })
+          .catch(error => {
+            console.error("Error fetching campaign data:", error);
+            toast.error(i18n.t("campaigns.fetchCampaignError"));
+            setCampaign((prev) => ({ ...prev }));
           });
-        }).catch(error => {
-          console.error("Error fetching campaign data:", error);
-          toast.error(i18n.t("campaigns.fetchCampaignError"));
-        });
       }
     }
   }, [campaignId, initialValues, companyId, fetchInitialData]);
-
+  
   useEffect(() => {
     const now = moment();
     const scheduledAt = moment(campaign.scheduledAt);
@@ -222,15 +228,18 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
       const dataValues = {};
       Object.entries(values).forEach(([key, value]) => {
         if (key === "scheduledAt" && value !== "" && value !== null) {
-          dataValues[key] = moment(value).format("YYYY-MM-DD HH:mm:ss");
+          // Convertir la hora local a UTC
+          const localTime = moment(value);
+          const utcTime = localTime.utc().format("YYYY-MM-DD HH:mm:ss");
+          dataValues[key] = utcTime;
         } else {
           dataValues[key] = value === "" ? null : value;
         }
       });
-
+  
       if (campaignId) {
         await api.put(`/campaigns/${campaignId}`, dataValues);
-
+  
         if (attachment != null) {
           const formData = new FormData();
           formData.append("file", attachment);
@@ -239,7 +248,7 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
         handleClose();
       } else {
         const { data } = await api.post("/campaigns", dataValues);
-
+  
         if (attachment != null) {
           const formData = new FormData();
           formData.append("file", attachment);
@@ -391,34 +400,7 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                       disabled={!campaignEditable}
                     />
                   </Grid>
-                  <Grid xs={12} md={4} item>
-                    <FormControl
-                      variant="outlined"
-                      margin="dense"
-                      fullWidth
-                      className={classes.formControl}
-                    >
-                      <InputLabel id="status-selection-label">
-                        {i18n.t("campaigns.dialog.form.status")}
-                      </InputLabel>
-                      <Field
-                        as={Select}
-                        label={i18n.t("campaigns.dialog.form.status")}
-                        name="status"
-                        labelId="status-selection-label"
-                        id="status"
-                        error={touched.status && Boolean(errors.status)}
-                      >
-                        <MenuItem value="Inactiva">Inactiva</MenuItem>
-                        <MenuItem value="PROGRAMADA">Programada</MenuItem>
-                        <MenuItem value="Proceso">En Proceso</MenuItem>
-                        <MenuItem value="PAUSADA">Pausada</MenuItem>
-                        <MenuItem value="CANCELADA">Cancelada</MenuItem>
-                        <MenuItem value="FINALIZADA">Finalizada</MenuItem>
-                      </Field>
-                    </FormControl>
-                  </Grid>
-                  <Grid xs={12} md={4} item>
+                    <Grid xs={12} md={4} item>
                     <Autocomplete
                       options={memoizedContactLists}
                       id="contactListId"
@@ -433,7 +415,7 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                           helperText={touched.contactListId && errors.contactListId}
                         />
                       )}
-  value={memoizedContactLists.find(list => list.id === values.contactListId) || null}
+                     value={memoizedContactLists.find(list => list.id === values.contactListId) || null}
                       onChange={(event, newValue) => {
                         setFieldValue("contactListId", newValue ? newValue.id : "");
                       }}

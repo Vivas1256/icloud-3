@@ -156,26 +156,26 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
           console.error("Error retrieving tags:", error);
         });
         
-      if (campaignId) {
-        api.get(`/campaigns/${campaignId}`).then(({ data }) => {
-          setCampaign((prev) => {
-            let prevCampaignData = { ...prev };
-
-            Object.entries(data).forEach(([key, value]) => {
-              if (key === "scheduledAt" && value !== "" && value !== null) {
-                // Convertir UTC a hora local
-                prevCampaignData[key] = moment.utc(value).local().format("YYYY-MM-DDTHH:mm");
-              } else {
-                prevCampaignData[key] = value === null ? "" : value;
-              }
+        if (campaignId) {
+          api.get(`/campaigns/${campaignId}`).then(({ data }) => {
+            setCampaign((prev) => {
+              let prevCampaignData = { ...prev };
+  
+              Object.entries(data).forEach(([key, value]) => {
+                if (key === "scheduledAt" && value !== "" && value !== null) {
+                  // Convertir UTC a hora local
+                  prevCampaignData[key] = moment.utc(value).local().format("YYYY-MM-DDTHH:mm");
+                } else {
+                  prevCampaignData[key] = value === null ? "" : value;
+                }
+              });
+  
+              return prevCampaignData;
             });
-
-            return prevCampaignData;
           });
-        });
+        }
       }
-    }
-  }, [campaignId, initialValues, companyId]);
+    }, [campaignId, initialValues, companyId]);
 
   useEffect(() => {
     const now = moment();

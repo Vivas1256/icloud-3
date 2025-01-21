@@ -203,10 +203,10 @@ const Campaigns = () => {
   const formatStatus = (val) => {
     switch (val) {
       case "INATIVA":
-        return "Inativa";
+        return "Inactiva";
       case "PROGRAMADA":
         return "Programada";
-      case "EM_ANDAMENTO":
+      case "En proceso":
         return "En proceso";
       case "CANCELADA":
         return "Cancelada";
@@ -370,7 +370,7 @@ const Campaigns = () => {
                     {campaign.status === "En Proceso" && (
                       <IconButton
                         onClick={() => cancelCampaign(campaign)}
-                        title="Parar Campaña"
+                        title="cancelar Campaña"
                         size="small"
                       >
                         <PauseCircleOutlineIcon />

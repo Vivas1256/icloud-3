@@ -15,7 +15,8 @@ import {
   CircularProgress, 
   FormControl, 
   Grid, 
-  IconButton 
+  IconButton,
+  Typography
 } from "@material-ui/core";
 import { Autocomplete } from "@material-ui/lab";
 import moment from "moment-timezone";
@@ -61,19 +62,23 @@ const ScheduleSchema = Yup.object().shape({
     .min(5, "Mensagem muito curta")
     .required("Obrigatório"),
   contactId: Yup.number().required("Obrigatório"),
-  sendAt: Yup.date().min(new Date(), "A data deve ser no futuro").required("Obrigatório")
+  sendAt: Yup.date()
+    .min(moment().add(5, 'minutes'), "A data deve ser pelo menos 5 minutos no futuro")
+    .required("Obrigatório")
 });
 
 const ScheduleModal = ({ open, onClose, scheduleId, contactId, cleanContact, reload }) => {
   const classes = useStyles();
   const history = useHistory();
   const { user } = useContext(AuthContext);
+  const userTimezone = moment.tz.guess();
 
   const initialState = {
     body: "",
     contactId: "",
     sendAt: moment().add(1, 'minutes').format('YYYY-MM-DDTHH:mm'),
-    sentAt: ""
+    sentAt: "",
+    timezone: userTimezone
   };
 
   const initialContact = {
@@ -108,7 +113,7 @@ const ScheduleModal = ({ open, onClose, scheduleId, contactId, cleanContact, rel
         setSchedule(prevState => ({
           ...prevState,
           ...data,
-          sendAt: moment.utc(data.sendAt).local().format('YYYY-MM-DDTHH:mm')
+          sendAt: moment.tz(data.sendAt, data.timezone).local().format('YYYY-MM-DDTHH:mm')
         }));
         setCurrentContact(data.contact);
       }
@@ -148,7 +153,8 @@ const ScheduleModal = ({ open, onClose, scheduleId, contactId, cleanContact, rel
   const handleSaveSchedule = async values => {
     const scheduleData = {
       ...values,
-      sendAt: moment(values.sendAt).utc().format('YYYY-MM-DD HH:mm:ss'),
+      sendAt: moment.tz(values.sendAt, userTimezone).utc().format(),
+      timezone: userTimezone,
       userId: user.id
     };
 
@@ -173,7 +179,8 @@ const ScheduleModal = ({ open, onClose, scheduleId, contactId, cleanContact, rel
         history.push('/schedules');
       }
     } catch (err) {
-      toastError(err);
+      console.error(err);
+      toast.error(i18n.t("scheduleModal.error"));
     }
     setCurrentContact(initialContact);
     setSchedule(initialState);
@@ -243,12 +250,7 @@ const ScheduleModal = ({ open, onClose, scheduleId, contactId, cleanContact, rel
           initialValues={schedule}
           enableReinitialize={true}
           validationSchema={ScheduleSchema}
-          onSubmit={(values, actions) => {
-            setTimeout(() => {
-              handleSaveSchedule(values);
-              actions.setSubmitting(false);
-            }, 400);
-          }}
+          onSubmit={handleSaveSchedule}
         >
           {({ touched, errors, isSubmitting, values, setFieldValue }) => (
             <Form>
@@ -309,6 +311,7 @@ const ScheduleModal = ({ open, onClose, scheduleId, contactId, cleanContact, rel
                     }}
                     inputProps={{
                       step: 60, // 1 minuto
+                      min: moment().add(5, 'minutes').format('YYYY-MM-DDTHH:mm')
                     }}
                     error={touched.sendAt && Boolean(errors.sendAt)}
                     helperText={touched.sendAt && errors.sendAt}
@@ -316,6 +319,9 @@ const ScheduleModal = ({ open, onClose, scheduleId, contactId, cleanContact, rel
                     fullWidth
                   />
                 </div>
+                <Typography variant="caption" color="textSecondary">
+                  {`Zona horária: ${userTimezone}`}
+                </Typography>
                 {(schedule.mediaPath || attachment) && (
                   <Grid xs={12} item>
                     <Button startIcon={<AttachFile />}>

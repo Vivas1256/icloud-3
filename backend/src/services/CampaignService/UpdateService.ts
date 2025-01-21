@@ -29,7 +29,7 @@ interface UpdateData {
 
 const updateSchema = Yup.object().shape({
   name: Yup.string().min(3, "Nombre demasiado corto"),
-  status: Yup.string().oneOf(['INACTIVA', 'PROGRAMADA', 'EN PROCESO', 'PAUSADA', 'CANCELADA', 'FINALIZADA'], "Status inválido"),
+  status: Yup.string().oneOf(['Inactiva', 'PROGRAMADA', 'Proceso', 'PAUSADA', 'CANCELADA', 'FINALIZADA'], "Status inválido"),
   scheduledAt: Yup.date().nullable(),
   contactListId: Yup.number().positive("ID de lista de contactos inválido"),
   // ... añadir validaciones para otros campos según sea necesario
@@ -53,7 +53,7 @@ const UpdateService = async (data: UpdateData): Promise<Campaign> => {
   const originalStatus = campaign.status;
 
   // Si la campaña se está pausando
-  if (originalStatus === 'EN PROCESO' && data.status === 'PAUSADA') {
+  if (originalStatus === 'Proceso' && data.status === 'PAUSADA') {
     await Message.update(
       { status: 'PENDIENTE' },
       { 
@@ -67,7 +67,7 @@ const UpdateService = async (data: UpdateData): Promise<Campaign> => {
   }
 
   // Si la campaña se está reanudando
-  if (originalStatus === 'PAUSADA' && data.status === 'EN PROCESO') {
+  if (originalStatus === 'PAUSADA' && data.status === 'Proceso') {
     await Message.update(
       { status: 'PROGRAMADO' },
       { 

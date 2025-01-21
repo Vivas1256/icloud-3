@@ -1,11 +1,11 @@
-import { logger } from "../utils/logger";
+import { Op } from "sequelize";
 import Campaign from "../../models/Campaign";
-import AppError from "../../errors/AppError";
 import CampaignShipping from "../../models/CampaignShipping";
 import ContactList from "../../models/ContactList";
 import ContactListItem from "../../models/ContactListItem";
 import Whatsapp from "../../models/Whatsapp";
 import Message from "../../models/Message";
+import AppError from "../../errors/AppError";
 
 const ShowService = async (id: string | number): Promise<Campaign> => {
   try {
@@ -27,9 +27,10 @@ const ShowService = async (id: string | number): Promise<Campaign> => {
       throw new AppError("ERR_NO_CAMPAIGN_FOUND", 404);
     }
 
+    console.log(`Campaign retrieved successfully: ${id}`);
     return record;
   } catch (error) {
-    logger.error(`Error fetching campaign with id ${id}:`, error);
+    console.error(`Error fetching campaign with id ${id}:`, error);
     if (error instanceof AppError) {
       throw error;
     }

@@ -213,6 +213,18 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
         }
       });
 
+      if (key === "scheduledAt" && value !== "" && value !== null) {
+        dataValues[key] = moment(value).format("YYYY-MM-DD HH:mm:ss");
+      } else {
+        dataValues[key] = value === "" ? null : value;
+      }
+
+      if (key === "scheduledAt" && value !== "" && value !== null) {
+        prevCampaignData[key] = moment(value).format("YYYY-MM-DDTHH:mm");
+      } else {
+        prevCampaignData[key] = value === null ? "" : value;
+      }
+
       if (!dataValues.whatsappId) {
         throw new Error(i18n.t("campaigns.errors.noWhatsapp"));
       }
@@ -418,7 +430,7 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                     />
                   </Grid>
                   <Grid item xs={12} md={4}>
-                    <Field
+                  <Field
                       as={TextField}
                       label={i18n.t("campaigns.dialog.form.scheduledAt")}
                       name="scheduledAt"

@@ -311,7 +311,7 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
       if (resetPagination) resetPagination();
     } catch (err) {
       console.error(err);
-      toast.error(i18n.t("campaigns.toasts.deleteError"));
+      toast.error(err.response?.data?.error || "Error al eliminar la campaña");
     }
   };
 

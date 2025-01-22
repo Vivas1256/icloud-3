@@ -457,120 +457,120 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                     />
                   </Grid>
                   <Grid item xs={12}>
-                    <Typography variant="caption" color="textSecondary">
-                      {`Zona horaria: ${userTimezone}`}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Tabs
-                      value={messageTab}
-                      indicatorColor="primary"
-                      textColor="primary"
-                      onChange={(e, newValue) => setMessageTab(newValue)}
-                      variant="fullWidth"
-                      centered
-                      className={classes.tabmsg}
-                    >
-                      <Tab label="Msg. 1" />
-                      <Tab label="Msg. 2" />
-                      <Tab label="Msg. 3" />
-                      <Tab label="Msg. 4" />
-                      <Tab label="Msg. 5" />
-                    </Tabs>
-                    <Box mt={2}>
-                      {messageTab === 0 && renderMessageField("message1")}
-                      {messageTab === 1 && renderMessageField("message2")}
-                      {messageTab === 2 && renderMessageField("message3")}
-                      {messageTab === 3 && renderMessageField("message4")}
-                      {messageTab === 4 && renderMessageField("message5")}
-                    </Box>
-                  </Grid>
-                  {(campaign.mediaPath || attachment) && (
-                    <Grid item xs={12}>
-                      <Button startIcon={<AttachFileIcon />}>
-                        {attachment != null
-                          ? attachment.name
-                          : campaign.mediaName}
-                      </Button>
-                      {campaignEditable && (
-                        <IconButton
-                          onClick={() => setConfirmationOpen(true)}
-                          color="secondary"
-                        >
-                          <DeleteOutlineIcon />
-                        </IconButton>
-                      )}
-                    </Grid>
-                  )}
+                  <Typography variant="caption" color="textSecondary">
+                    {`Zona horaria: ${userTimezone}`}
+                  </Typography>
                 </Grid>
-              </DialogContent>
-              <DialogActions>
-                {campaign.status === "CANCELADA" && (
-                  <Button
-                    color="primary"
-                    onClick={restartCampaign}
-                    variant="outlined"
+                <Grid item xs={12}>
+                  <Tabs
+                    value={messageTab}
+                    indicatorColor="primary"
+                    textColor="primary"
+                    onChange={(e, newValue) => setMessageTab(newValue)}
+                    variant="fullWidth"
+                    centered
+                    className={classes.tabmsg}
                   >
-                    {i18n.t("campaigns.dialog.buttons.restart")}
-                  </Button>
+                    <Tab label="Msg. 1" />
+                    <Tab label="Msg. 2" />
+                    <Tab label="Msg. 3" />
+                    <Tab label="Msg. 4" />
+                    <Tab label="Msg. 5" />
+                  </Tabs>
+                  <Box mt={2}>
+                    {messageTab === 0 && renderMessageField("message1")}
+                    {messageTab === 1 && renderMessageField("message2")}
+                    {messageTab === 2 && renderMessageField("message3")}
+                    {messageTab === 3 && renderMessageField("message4")}
+                    {messageTab === 4 && renderMessageField("message5")}
+                  </Box>
+                </Grid>
+                {(campaign.mediaPath || attachment) && (
+                  <Grid item xs={12}>
+                    <Button startIcon={<AttachFileIcon />}>
+                      {attachment != null
+                        ? attachment.name
+                        : campaign.mediaName}
+                    </Button>
+                    {campaignEditable && (
+                      <IconButton
+                        onClick={() => setConfirmationOpen(true)}
+                        color="secondary"
+                      >
+                        <DeleteOutlineIcon />
+                      </IconButton>
+                    )}
+                  </Grid>
                 )}
-                {campaign.status === "Proceso" && (
-                  <Button
-                    color="primary"
-                    onClick={cancelCampaign}
-                    variant="outlined"
-                  >
-                    {i18n.t("campaigns.dialog.buttons.cancel")}
-                  </Button>
-                )}
-                {!attachment && !campaign.mediaPath && campaignEditable && (
-                  <Button
-                    color="primary"
-                    onClick={() => attachmentFile.current.click()}
-                    disabled={isSubmitting}
-                    variant="outlined"
-                  >
-                    {i18n.t("campaigns.dialog.buttons.attach")}
-                  </Button>
-                )}
+              </Grid>
+            </DialogContent>
+            <DialogActions>
+              {campaign.status === "CANCELADA" && (
                 <Button
-                  onClick={handleClose}
-                  color="secondary"
+                  color="primary"
+                  onClick={restartCampaign}
+                  variant="outlined"
+                >
+                  {i18n.t("campaigns.dialog.buttons.restart")}
+                </Button>
+              )}
+              {campaign.status === "Proceso" && (
+                <Button
+                  color="primary"
+                  onClick={cancelCampaign}
+                  variant="outlined"
+                >
+                  {i18n.t("campaigns.dialog.buttons.cancel")}
+                </Button>
+              )}
+              {!attachment && !campaign.mediaPath && campaignEditable && (
+                <Button
+                  color="primary"
+                  onClick={() => attachmentFile.current.click()}
                   disabled={isSubmitting}
                   variant="outlined"
                 >
-                  {i18n.t("campaigns.dialog.buttons.close")}
+                  {i18n.t("campaigns.dialog.buttons.attach")}
                 </Button>
-                {(campaignEditable || campaign.status === "CANCELADA") && (
-                  <Button
-                    type="submit"
-                    color="primary"
-                    disabled={isSubmitting}
-                    variant="contained"
-                    className={classes.btnWrapper}
-                  >
-                    {campaignId
-                      ? i18n.t("campaigns.dialog.buttons.edit")
-                      : i18n.t("campaigns.dialog.buttons.add")}
-                    {isSubmitting && (
-                      <CircularProgress
-                        size={24}
-                        className={classes.buttonProgress}
-                      />
-                    )}
-                  </Button>
-                )}
-              </DialogActions>
-            </Form>
-          )}
-        </Formik>
-      </Dialog>
-      <input
-        type="file"
-        ref={attachmentFile}
-        style={{ display: "none" }}
-        onChange={(e) => handleAttachmentFile(e)}
-      />
+              )}
+              <Button
+                onClick={handleClose}
+                color="secondary"
+                disabled={isSubmitting}
+                variant="outlined"
+              >
+                {i18n.t("campaigns.dialog.buttons.close")}
+              </Button>
+              {(campaignEditable || campaign.status === "CANCELADA") && (
+                <Button
+                  type="submit"
+                  color="primary"
+                  disabled={isSubmitting}
+                  variant="contained"
+                  className={classes.btnWrapper}
+                >
+                  {campaignId
+                    ? i18n.t("campaigns.dialog.buttons.edit")
+                    : i18n.t("campaigns.dialog.buttons.add")}
+                  {isSubmitting && (
+                    <CircularProgress
+                      size={24}
+                      className={classes.buttonProgress}
+                    />
+                  )}
+                </Button>
+              )}
+            </DialogActions>
+          </Form>
+        )}
+      </Formik>
+    </Dialog>
+    <input
+      type="file"
+      ref={attachmentFile}
+      style={{ display: "none" }}
+      onChange={(e) => handleAttachmentFile(e)}
+    />
     </div>
   );
 };

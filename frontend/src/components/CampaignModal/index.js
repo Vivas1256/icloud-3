@@ -16,6 +16,10 @@ import {
   Box,
   Tab,
   Tabs,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@material-ui/core";
 import { green } from "@material-ui/core/colors";
 import { makeStyles } from "@material-ui/core/styles";
@@ -312,6 +316,23 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
     );
   };
 
+  const renderConfirmationMessageField = (identifier) => {
+    return (
+      <Field
+        as={TextField}
+        id={identifier}
+        name={identifier}
+        fullWidth
+        rows={5}
+        label={i18n.t(`campaigns.dialog.form.${identifier}`)}
+        placeholder={i18n.t("campaigns.dialog.form.messagePlaceholder")}
+        multiline={true}
+        variant="outlined"
+        disabled={!campaignEditable && campaign.status !== "CANCELADA"}
+      />
+    );
+  };
+
   return (
     <div className={classes.root}>
       <ConfirmationModal
@@ -418,7 +439,7 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                     />
                   </Grid>
                   <Grid item xs={12} md={4}>
-                  <Field
+                    <Field
                       as={TextField}
                       label={i18n.t("campaigns.dialog.form.scheduledAt")}
                       name="scheduledAt"
@@ -457,6 +478,31 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                       disabled={!campaignEditable}
                     />
                   </Grid>
+                  <Grid item xs={12} md={4}>
+                    <FormControl
+                      variant="outlined"
+                      margin="dense"
+                      fullWidth
+                      className={classes.formControl}
+                    >
+                      <InputLabel id="confirmation-selection-label">
+                        {i18n.t("campaigns.dialog.form.confirmation")}
+                      </InputLabel>
+                      <Field
+                        as={Select}
+                        label={i18n.t("campaigns.dialog.form.confirmation")}
+                        placeholder={i18n.t("campaigns.dialog.form.confirmation")}
+                        labelId="confirmation-selection-label"
+                        id="confirmation"
+                        name="confirmation"
+                        error={touched.confirmation && Boolean(errors.confirmation)}
+                        disabled={!campaignEditable}
+                      >
+                        <MenuItem value={false}>Desabilitada</MenuItem>
+                        <MenuItem value={true}>Habilitada</MenuItem>
+                      </Field>
+                    </FormControl>
+                  </Grid>
                   <Grid item xs={12}>
                     <Tabs
                       value={messageTab}
@@ -474,11 +520,86 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                       <Tab label="Msg. 5" />
                     </Tabs>
                     <Box mt={2}>
-                      {messageTab === 0 && renderMessageField("message1")}
-                      {messageTab === 1 && renderMessageField("message2")}
-                      {messageTab === 2 && renderMessageField("message3")}
-                      {messageTab === 3 && renderMessageField("message4")}
-                      {messageTab === 4 && renderMessageField("message5")}
+                      {messageTab === 0 && (
+                        <>
+                          {values.confirmation ? (
+                            <Grid container spacing={2}>
+                              <Grid item xs={12} md={8}>
+                                {renderMessageField("message1")}
+                              </Grid>
+                              <Grid item xs={12} md={4}>
+                                {renderConfirmationMessageField("confirmationMessage1")}
+                              </Grid>
+                            </Grid>
+                          ) : (
+                            renderMessageField("message1")
+                          )}
+                        </>
+                      )}
+                      {messageTab === 1 && (
+                        <>
+                          {values.confirmation ? (
+                            <Grid container spacing={2}>
+                              <Grid item xs={12} md={8}>
+                                {renderMessageField("message2")}
+                              </Grid>
+                              <Grid item xs={12} md={4}>
+                                {renderConfirmationMessageField("confirmationMessage2")}
+                              </Grid>
+                            </Grid>
+                          ) : (
+                            renderMessageField("message2")
+                          )}
+                        </>
+                      )}
+                      {messageTab === 2 && (
+                        <>
+                          {values.confirmation ? (
+                            <Grid container spacing={2}>
+                              <Grid item xs={12} md={8}>
+                                {renderMessageField("message3")}
+                              </Grid>
+                              <Grid item xs={12} md={4}>
+                                {renderConfirmationMessageField("confirmationMessage3")}
+                              </Grid>
+                            </Grid>
+                          ) : (
+                            renderMessageField("message3")
+                          )}
+                        </>
+                      )}
+                      {messageTab === 3 && (
+                        <>
+                          {values.confirmation ? (
+                            <Grid container spacing={2}>
+                              <Grid item xs={12} md={8}>
+                                {renderMessageField("message4")}
+                              </Grid>
+                              <Grid item xs={12} md={4}>
+                                {renderConfirmationMessageField("confirmationMessage4")}
+                              </Grid>
+                            </Grid>
+                          ) : (
+                            renderMessageField("message4")
+                          )}
+                        </>
+                      )}
+                      {messageTab === 4 && (
+                        <>
+                          {values.confirmation ? (
+                            <Grid container spacing={2}>
+                              <Grid item xs={12} md={8}>
+                                {renderMessageField("message5")}
+                              </Grid>
+                              <Grid item xs={12} md={4}>
+                                {renderConfirmationMessageField("confirmationMessage5")}
+                              </Grid>
+                            </Grid>
+                          ) : (
+                            renderMessageField("message5")
+                          )}
+                        </>
+                      )}
                     </Box>
                   </Grid>
                   {(campaign.mediaPath || attachment) && (

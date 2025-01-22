@@ -571,8 +571,7 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
       style={{ display: "none" }}
       onChange={(e) => handleAttachmentFile(e)}
     />
-    </div>
-  );
-};
+  </div>
+);
 
 export default CampaignModal;

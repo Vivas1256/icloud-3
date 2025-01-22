@@ -503,10 +503,10 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                   </Grid>
                 )}
               </Grid>
-            </DialogContent>
-            <DialogActions>
-              {campaign.status === "CANCELADA" && (
-                <Button
+                </DialogContent>
+                  <DialogActions>
+                  {campaign.status === "CANCELADA" && (
+                  <Button
                   color="primary"
                   onClick={restartCampaign}
                   variant="outlined"

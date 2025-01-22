@@ -206,33 +206,21 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
       const dataValues = {};
       Object.entries(values).forEach(([key, value]) => {
         if (key === "scheduledAt" && value !== "" && value !== null) {
-          // Convertir la hora local a UTC
+          // Convert local time to UTC
           dataValues[key] = moment.tz(value, moment.tz.guess()).utc().format("YYYY-MM-DD HH:mm:ss");
         } else {
           dataValues[key] = value === "" ? null : value;
         }
       });
-
-      if (key === "scheduledAt" && value !== "" && value !== null) {
-        dataValues[key] = moment(value).format("YYYY-MM-DD HH:mm:ss");
-      } else {
-        dataValues[key] = value === "" ? null : value;
-      }
-
-      if (key === "scheduledAt" && value !== "" && value !== null) {
-        prevCampaignData[key] = moment(value).format("YYYY-MM-DDTHH:mm");
-      } else {
-        prevCampaignData[key] = value === null ? "" : value;
-      }
-
+  
       if (!dataValues.whatsappId) {
         throw new Error(i18n.t("campaigns.errors.noWhatsapp"));
       }
-
+  
       if (!dataValues.contactListId && !dataValues.tagListId) {
         throw new Error(i18n.t("campaigns.errors.noContactOrTag"));
       }
-
+  
       let savedCampaign;
       if (campaignId) {
         const { data } = await api.put(`/campaigns/${campaignId}`, dataValues);
@@ -243,17 +231,17 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
         savedCampaign = data;
         toast.success(i18n.t("campaigns.toasts.created"));
       }
-
+  
       if (attachment != null) {
         const formData = new FormData();
         formData.append("file", attachment);
         await api.post(`/campaigns/${savedCampaign.id}/media-upload`, formData);
       }
-
+  
       if (onSave) {
         onSave(savedCampaign);
       }
-
+  
       setCampaign(savedCampaign);
       handleClose();
     } catch (err) {

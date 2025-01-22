@@ -174,6 +174,28 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
     }
   }, [campaignId, initialValues, companyId, userTimezone]);
 
+  // Nueva función useEffect añadida aquí
+  useEffect(() => {
+    if (campaignId) {
+      const fetchCampaign = async () => {
+        try {
+          const { data } = await api.get(`/campaigns/${campaignId}`);
+          const formattedData = {
+            ...data,
+            scheduledAt: data.scheduledAt ? moment.utc(data.scheduledAt).tz(userTimezone).format("YYYY-MM-DDTHH:mm") : "",
+            whatsappId: data.whatsappId ? data.whatsappId.toString() : "",
+            contactListId: data.contactListId ? data.contactListId.toString() : "",
+            tagListId: data.tagListId ? data.tagListId.toString() : "Ninguna",
+          };
+          setCampaign(formattedData);
+        } catch (err) {
+          toastError(err);
+        }
+      };
+      fetchCampaign();
+    }
+  }, [campaignId, userTimezone]);
+
   useEffect(() => {
     const now = moment();
     const scheduledAt = moment(campaign.scheduledAt);
@@ -574,6 +596,6 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
       />
     </div>
   );
-  };
-  
-  export default CampaignModal;
+};
+
+export default CampaignModal;

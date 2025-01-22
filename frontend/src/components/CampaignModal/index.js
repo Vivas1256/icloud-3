@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState, useMemo } from "react";
+import React, { useContext, useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { Field, Form, Formik } from "formik";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
@@ -107,6 +107,24 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
   const memoizedWhatsapps = useMemo(() => whatsapps, [whatsapps]);
   const memoizedFiles = useMemo(() => file, [file]);
 
+  const fetchCampaignData = useCallback(async () => {
+    if (campaignId) {
+      try {
+        const { data } = await api.get(`/campaigns/${campaignId}`);
+        const formattedData = {
+          ...data,
+          scheduledAt: data.scheduledAt ? moment.utc(data.scheduledAt).tz(userTimezone).format("YYYY-MM-DDTHH:mm") : "",
+          whatsappId: data.whatsappId ? data.whatsappId.toString() : "",
+          contactListId: data.contactListId ? data.contactListId.toString() : "",
+          tagListId: data.tagListId ? data.tagListId.toString() : "Ninguna",
+        };
+        setCampaign(formattedData);
+      } catch (err) {
+        toastError(err);
+      }
+    }
+  }, [campaignId, userTimezone]);
+
   useEffect(() => {
     return () => {
       isMounted.current = false;
@@ -127,12 +145,8 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
   }, [companyId]);
 
   useEffect(() => {
-    if (isMounted.current) {
-      if (initialValues) {
-        setCampaign((prevState) => {
-          return { ...prevState, ...initialValues };
-        });
-      }
+    if (open) {
+      fetchCampaignData();
 
       api.get(`/contact-lists/list`, { params: { companyId } })
         .then(({ data }) => setContactLists(data));
@@ -152,49 +166,8 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
         .catch((error) => {
           console.error("Error retrieving tags:", error);
         });
-        
-      if (campaignId) {
-        api.get(`/campaigns/${campaignId}`).then(({ data }) => {
-          setCampaign((prev) => {
-            let prevCampaignData = { ...prev };
-
-            Object.entries(data).forEach(([key, value]) => {
-              if (key === "scheduledAt" && value !== "" && value !== null) {
-                // Convertir UTC a hora local
-                prevCampaignData[key] = moment.utc(value).tz(userTimezone).format("YYYY-MM-DDTHH:mm");
-              } else {
-                prevCampaignData[key] = value === null ? "" : value;
-              }
-            });
-
-            return prevCampaignData;
-          });
-        });
-      }
     }
-  }, [campaignId, initialValues, companyId, userTimezone]);
-
-  // Nueva función useEffect añadida aquí
-  useEffect(() => {
-    if (campaignId) {
-      const fetchCampaign = async () => {
-        try {
-          const { data } = await api.get(`/campaigns/${campaignId}`);
-          const formattedData = {
-            ...data,
-            scheduledAt: data.scheduledAt ? moment.utc(data.scheduledAt).tz(userTimezone).format("YYYY-MM-DDTHH:mm") : "",
-            whatsappId: data.whatsappId ? data.whatsappId.toString() : "",
-            contactListId: data.contactListId ? data.contactListId.toString() : "",
-            tagListId: data.tagListId ? data.tagListId.toString() : "Ninguna",
-          };
-          setCampaign(formattedData);
-        } catch (err) {
-          toastError(err);
-        }
-      };
-      fetchCampaign();
-    }
-  }, [campaignId, userTimezone]);
+  }, [open, companyId, fetchCampaignData]);
 
   useEffect(() => {
     const now = moment();
@@ -225,7 +198,6 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
       const dataValues = {};
       Object.entries(values).forEach(([key, value]) => {
         if (key === "scheduledAt" && value !== "" && value !== null) {
-          // Convertir hora local a UTC
           dataValues[key] = moment.tz(value, userTimezone).utc().format();
         } else {
           dataValues[key] = value === "" ? null : value;

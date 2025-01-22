@@ -2,9 +2,9 @@ import { head } from "lodash";
 import XLSX from "xlsx";
 import { has } from "lodash";
 import ContactListItem from "../../models/ContactListItem";
+import Tag from "../../models/Tag"; // Asegúrate de que este modelo exista
 import CheckContactNumber from "../WbotServices/CheckNumber";
 import { logger } from "../../utils/logger";
-// import CheckContactNumber from "../WbotServices/CheckNumber";
 
 export async function ImportContacts(
   contactListId: number,
@@ -18,6 +18,7 @@ export async function ImportContacts(
     let name = "";
     let number = "";
     let email = "";
+    let tags: string[] = [];
 
     if (has(row, "nome") || has(row, "Nome")) {
       name = row["nome"] || row["Nome"];
@@ -42,7 +43,11 @@ export async function ImportContacts(
       email = row["email"] || row["e-mail"] || row["Email"] || row["E-mail"];
     }
 
-    return { name, number, email, contactListId, companyId };
+    if (has(row, "tags") || has(row, "Tags")) {
+      tags = (row["tags"] || row["Tags"]).split(',').map((tag: string) => tag.trim());
+    }
+
+    return { name, number, email, tags, contactListId, companyId };
   });
 
   const contactList: ContactListItem[] = [];
@@ -56,12 +61,22 @@ export async function ImportContacts(
       },
       defaults: contact
     });
+
     if (created) {
+      // Crear o encontrar las etiquetas y asociarlas al contacto
+      for (const tagName of contact.tags) {
+        const [tag] = await Tag.findOrCreate({
+          where: { name: tagName, companyId },
+          defaults: { name: tagName, color: "#000000", companyId } // Color por defecto
+        });
+        await newContact.addTag(tag);
+      }
+
       contactList.push(newContact);
     }
   }
 
-  if (contactList) {
+  if (contactList.length > 0) {
     for (let newContact of contactList) {
       try {
         const response = await CheckContactNumber(newContact.number, companyId);
@@ -76,4 +91,4 @@ export async function ImportContacts(
   }
 
   return contactList;
-}
+}9

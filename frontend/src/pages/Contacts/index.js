@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useReducer, useContext, useRef } from "react";
-
 import { toast } from "react-toastify";
 import { useHistory } from "react-router-dom";
-import { Tooltip } from "@material-ui/core";
+import { Tooltip, Menu, MenuItem } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -20,11 +19,14 @@ import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import IconButton from "@material-ui/core/IconButton";
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
 import EditIcon from "@material-ui/icons/Edit";
+import CancelIcon from "@material-ui/icons/Cancel";
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+
 import api from "../../services/api";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
 import ContactModal from "../../components/ContactModal";
 import ConfirmationModal from "../../components/ConfirmationModal/";
-import CancelIcon from "@material-ui/icons/Cancel";
 import { i18n } from "../../translate/i18n";
 import MainHeader from "../../components/MainHeader";
 import Title from "../../components/Title";
@@ -36,7 +38,14 @@ import { Can } from "../../components/Can";
 import NewTicketModal from "../../components/NewTicketModal";
 import { SocketContext } from "../../context/Socket/SocketContext";
 
-import {CSVLink} from "react-csv";
+const useStyles = makeStyles((theme) => ({
+  mainPaper: {
+    flex: 1,
+    padding: theme.spacing(1),
+    overflowY: "scroll",
+    ...theme.scrollbarStyles,
+  },
+}));
 
 const reducer = (state, action) => {
   if (action.type === "LOAD_CONTACTS") {
@@ -82,15 +91,6 @@ const reducer = (state, action) => {
   }
 };
 
-const useStyles = makeStyles((theme) => ({
-  mainPaper: {
-    flex: 1,
-    padding: theme.spacing(1),
-    overflowY: "scroll",
-    ...theme.scrollbarStyles,
-  },
-}));
-
 const Contacts = () => {
   const classes = useStyles();
   const history = useHistory();
@@ -109,6 +109,10 @@ const Contacts = () => {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [hasMore, setHasMore] = useState(false);
   const fileUploadRef = useRef(null);
+
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [tags, setTags] = useState([]);
 
   const socketManager = useContext(SocketContext);
 
@@ -154,7 +158,19 @@ const Contacts = () => {
     return () => {
       socket.disconnect();
     };
-  }, [ socketManager]);
+  }, [socketManager]);
+
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const { data } = await api.get("/tags");
+        setTags(data);
+      } catch (err) {
+        toastError(err);
+      }
+    };
+    fetchTags();
+  }, []);
 
   const handleSearch = (event) => {
     setSearchParam(event.target.value.toLowerCase());
@@ -169,22 +185,6 @@ const Contacts = () => {
     setSelectedContactId(null);
     setContactModalOpen(false);
   };
-
-  // const handleSaveTicket = async contactId => {
-  // 	if (!contactId) return;
-  // 	setLoading(true);
-  // 	try {
-  // 		const { data: ticket } = await api.post("/tickets", {
-  // 			contactId: contactId,
-  // 			userId: user?.id,
-  // 			status: "open",
-  // 		});
-  // 		history.push(`/tickets/${ticket.id}`);
-  // 	} catch (err) {
-  // 		toastError(err);
-  // 	}
-  // 	setLoading(false);
-  // };
 
   const handleCloseOrOpenTicket = (ticket) => {
     setNewTicketModalOpen(false);
@@ -209,7 +209,7 @@ const Contacts = () => {
     setSearchParam("");
     setPageNumber(1);
   };
-  
+
   const handleimportContact = async () => {
     try {
       if (!!fileUploadRef.current.files[0]) {
@@ -228,26 +228,93 @@ const Contacts = () => {
       toastError(err);
     }
   };
-  
-function getDateLastMessage(contact) {
+
+  const handleExportClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleExportClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleExport = async (format) => {
+    try {
+      const { data } = await api.get("/contacts", {
+        params: { searchParam, pageNumber: 1, pageSize: 9999999 },
+      });
+      const exportData = data.contacts.map((contact) => ({
+        Nombre: contact.name,
+        Número: contact.number,
+        Email: contact.email,
+        'Última interacción': getDateLastMessage(contact),
+        Status: contact.active ? 'Activo' : 'Inactivo',
+        Etiquetas: contact.tags.map(tag => tag.name).join(", ")
+      }));
+
+      if (format === 'csv') {
+        const csvContent = "data:text/csv;charset=utf-8," 
+          + Object.keys(exportData[0]).join(";") + "\n"
+          + exportData.map(row => Object.values(row).join(";")).join("\n");
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "Contactos.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else if (format === 'xlsx') {
+        const worksheet = XLSX.utils.json_to_sheet(exportData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Contactos");
+        const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+        const data = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        saveAs(data, "Contactos.xlsx");
+      }
+    } catch (err) {
+      toastError(err);
+    }
+    handleExportClose();
+  };
+
+  const handleSyncContacts = async () => {
+    try {
+      await api.post("/contacts/sync");
+      toast.success(i18n.t("contacts.toasts.sync"));
+    } catch (err) {
+      toastError(err);
+    }
+  };
+
+  const handleImportContacts = async (file) => {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      await api.post("/contacts/import", formData);
+      history.go(0);
+    } catch (err) {
+      toastError(err);
+    }
+  };
+
+  function getDateLastMessage(contact) {
     if (!contact) return null;
     if (!contact.tickets) return null;
 
     if (contact.tickets.length > 0) {
-        const date = new Date(contact.tickets[contact.tickets.length - 1].updatedAt);
+      const date = new Date(contact.tickets[contact.tickets.length - 1].updatedAt);
 
-        const day = date.getDate() > 9 ? date.getDate() : `0${date.getDate()}`;
-        const month = (date.getMonth() + 1) > 9 ? (date.getMonth() + 1) : `0${date.getMonth() + 1}`;
-        const year = date.getFullYear().toString().slice(-2);
+      const day = date.getDate() > 9 ? date.getDate() : `0${date.getDate()}`;
+      const month = (date.getMonth() + 1) > 9 ? (date.getMonth() + 1) : `0${date.getMonth() + 1}`;
+      const year = date.getFullYear().toString().slice(-2);
 
-        const hours = date.getHours() > 9 ? date.getHours() : `0${date.getHours()}`;
-        const minutes = date.getMinutes() > 9 ? date.getMinutes() : `0${date.getMinutes()}`;
+      const hours = date.getHours() > 9 ? date.getHours() : `0${date.getHours()}`;
+      const minutes = date.getMinutes() > 9 ? date.getMinutes() : `0${date.getMinutes()}`;
 
-        return `${day}/${month}/${year} ${hours}:${minutes}`;
+      return `${day}/${month}/${year} ${hours}:${minutes}`;
     }
 
     return null;
-}
+  }
 
   const loadMore = () => {
     setPageNumber((prevState) => prevState + 1);
@@ -315,20 +382,20 @@ function getDateLastMessage(contact) {
           <Button
             variant="contained"
             color="primary"
-            onClick={(e) => setConfirmOpen(true)}
+            onClick={handleSyncContacts}
           >
-            {i18n.t("contacts.buttons.import")}
+            {i18n.t("contacts.buttons.syncWhatsapp")}
           </Button>
           <Button
-          variant="contained"
-          color="primary"
-          onClick={() => {
-            fileUploadRef.current.value = null;
-            fileUploadRef.current.click();
-          }}
-      >
-        {i18n.t("contacts.buttons.importSheet")}
-      </Button>
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              fileUploadRef.current.value = null;
+              fileUploadRef.current.click();
+            }}
+          >
+            {i18n.t("contacts.buttons.importExcel")}
+          </Button>
           <Button
             variant="contained"
             color="primary"
@@ -336,13 +403,26 @@ function getDateLastMessage(contact) {
           >
             {i18n.t("contacts.buttons.add")}
           </Button>
-
-         <CSVLink style={{ textDecoration:'none'}} separator=";" filename={'Contactos.csv'} data={contacts.map((contact) => ({ name: contact.name, number: contact.number, email: contact.email }))}>
-          <Button	variant="contained" color="primary"> 
-          EXPORTAR CONTATOS 
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleExportClick}
+          >
+            {i18n.t("contacts.buttons.export")}
           </Button>
-          </CSVLink>		  
-
+          <Menu
+            anchorEl={anchorEl}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClose={handleExportClose}
+          >
+            <MenuItem onClick={() => handleExport('csv')}>
+              {i18n.t("contacts.buttons.exportCSV")}
+            </MenuItem>
+            <MenuItem onClick={() => handleExport('xlsx')}>
+              {i18n.t("contacts.buttons.exportExcel")}
+            </MenuItem>
+          </Menu>
         </MainHeaderButtonsWrapper>
       </MainHeader>
       <Paper
@@ -350,19 +430,15 @@ function getDateLastMessage(contact) {
         variant="outlined"
         onScroll={handleScroll}
       >
-        <>
-          <input
-              style={{ display: "none" }}
-              id="upload"
-              name="file"
-              type="file"
-              accept=".xls,.xlsx"
-              onChange={() => {
-                setConfirmOpen(true);
-              }}
-              ref={fileUploadRef}
-          />
-        </>
+        <input
+          style={{ display: "none" }}
+          id="upload"
+          name="file"
+          type="file"
+          accept=".xls,.xlsx"
+          onChange={(e) => handleImportContacts(e.target.files[0])}
+          ref={fileUploadRef}
+        />
         <Table size="small">
           <TableHead>
             <TableRow>
@@ -375,9 +451,9 @@ function getDateLastMessage(contact) {
                 {i18n.t("contacts.table.email")}
               </TableCell>
               <TableCell align="center">
-              {"Última interacción"}
+                {"Última interacción"}
               </TableCell>
-			  <TableCell align="center">{"Status"}</TableCell>
+              <TableCell align="center">{"Status"}</TableCell>
               <TableCell align="center">
                 {i18n.t("contacts.table.actions")}
               </TableCell>
@@ -393,22 +469,22 @@ function getDateLastMessage(contact) {
                   <TableCell>{contact.name}</TableCell>
                   <TableCell align="center">{contact.number}</TableCell>
                   <TableCell align="center">{contact.email}</TableCell>
-                                    <TableCell align="center">
-                                        {getDateLastMessage(contact)}
-                                    </TableCell>
-                                    <TableCell align="center">
-                                        {contact.active ? (
-                                            <CheckCircleIcon
-                                                style={{ color: "green" }}
-                                                fontSize="small"
-                                            />
-                                        ) : (
-                                            <CancelIcon
-                                                style={{ color: "red" }}
-                                                fontSize="small"
-                                            />
-                                        )}
-                                    </TableCell>
+                  <TableCell align="center">
+                    {getDateLastMessage(contact)}
+                  </TableCell>
+                  <TableCell align="center">
+                    {contact.active ? (
+                      <CheckCircleIcon
+                        style={{ color: "green" }}
+                        fontSize="small"
+                      />
+                    ) : (
+                      <CancelIcon
+                        style={{ color: "red" }}
+                        fontSize="small"
+                      />
+                    )}
+                  </TableCell>
                   <TableCell align="center">
                     <IconButton
                       size="small"

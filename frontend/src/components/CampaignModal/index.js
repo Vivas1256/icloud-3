@@ -146,8 +146,12 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
   }, [companyId]);
 
   useEffect(() => {
-    if (open) {
-      fetchCampaignData();
+    if (isMounted.current) {
+      if (initialValues) {
+        setCampaign((prevState) => {
+          return { ...prevState, ...initialValues };
+        });
+      }
 
       api.get(`/contact-lists/list`, { params: { companyId } })
         .then(({ data }) => setContactLists(data));
@@ -167,8 +171,27 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
         .catch((error) => {
           console.error("Error retrieving tags:", error);
         });
+        
+      if (campaignId) {
+        api.get(`/campaigns/${campaignId}`).then(({ data }) => {
+          setCampaign((prev) => {
+            let prevCampaignData = { ...prev };
+
+            Object.entries(data).forEach(([key, value]) => {
+              if (key === "scheduledAt" && value !== "" && value !== null) {
+                // Convertir UTC a hora local
+                prevCampaignData[key] = moment.utc(value).tz(userTimezone).format("YYYY-MM-DDTHH:mm");
+              } else {
+                prevCampaignData[key] = value === null ? "" : value;
+              }
+            });
+
+            return prevCampaignData;
+          });
+        });
+      }
     }
-  }, [open, companyId, fetchCampaignData]);
+  }, [campaignId, initialValues, companyId, userTimezone]);
 
   useEffect(() => {
     const now = moment();
@@ -199,6 +222,7 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
       const dataValues = {};
       Object.entries(values).forEach(([key, value]) => {
         if (key === "scheduledAt" && value !== "" && value !== null) {
+          // Convertir hora local a UTC
           dataValues[key] = moment.tz(value, userTimezone).utc().format();
         } else {
           dataValues[key] = value === "" ? null : value;
@@ -286,7 +310,8 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
       onClose();
       if (resetPagination) resetPagination();
     } catch (err) {
-      toast.error(err.message);
+      console.error(err);
+      toast.error(i18n.t("campaigns.toasts.deleteError"));
     }
   };
 

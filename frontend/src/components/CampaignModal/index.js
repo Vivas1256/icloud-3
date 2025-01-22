@@ -99,6 +99,7 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
   const [messageTab, setMessageTab] = useState(0);
   const [attachment, setAttachment] = useState(null);
   const [confirmationOpen, setConfirmationOpen] = useState(false);
+  const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
   const [campaignEditable, setCampaignEditable] = useState(true);
   const attachmentFile = useRef(null);
 
@@ -278,6 +279,17 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
     }
   };
 
+  const handleDeleteCampaign = async () => {
+    try {
+      await api.delete(`/campaigns/${campaignId}`);
+      toast.success(i18n.t("campaigns.toasts.deleted"));
+      onClose();
+      if (resetPagination) resetPagination();
+    } catch (err) {
+      toast.error(err.message);
+    }
+  };
+
   const renderMessageField = (identifier) => {
     return (
       <Box mb={2}>
@@ -312,6 +324,14 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
         open={confirmationOpen}
         onClose={() => setConfirmationOpen(false)}
         onConfirm={deleteMedia}
+      >
+        {i18n.t("campaigns.confirmationModal.deleteMessage")}
+      </ConfirmationModal>
+      <ConfirmationModal
+        title={i18n.t("campaigns.confirmationModal.deleteTitle")}
+        open={deleteConfirmationOpen}
+        onClose={() => setDeleteConfirmationOpen(false)}
+        onConfirm={handleDeleteCampaign}
       >
         {i18n.t("campaigns.confirmationModal.deleteMessage")}
       </ConfirmationModal>
@@ -536,6 +556,15 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                 >
                   {i18n.t("campaigns.dialog.buttons.close")}
                 </Button>
+                {campaignId && (
+                  <Button
+                    color="secondary"
+                    onClick={() => setDeleteConfirmationOpen(true)}
+                    variant="outlined"
+                  >
+                    {i18n.t("campaigns.dialog.buttons.delete")}
+                  </Button>
+                )}
                 {(campaignEditable || campaign.status === "CANCELADA") && (
                   <Button
                     type="submit"

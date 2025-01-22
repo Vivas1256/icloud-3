@@ -8,6 +8,9 @@ import ShowService from "../services/ContactListItemService/ShowService";
 import UpdateService from "../services/ContactListItemService/UpdateService";
 import DeleteService from "../services/ContactListItemService/DeleteService";
 import FindService from "../services/ContactListItemService/FindService";
+import SyncService from "../services/ContactListItemService/SyncService";
+import ImportService from "../services/ContactListItemService/ImportService";
+import ExportService from "../services/ContactListItemService/ExportService";
 
 import ContactListItem from "../models/ContactListItem";
 
@@ -142,4 +145,58 @@ export const findList = async (
   const records: ContactListItem[] = await FindService(params);
 
   return res.status(200).json(records);
+};
+
+export const syncContacts = async (req: Request, res: Response): Promise<Response> => {
+  const { companyId } = req.user;
+  
+  try {
+    const result = await SyncService(companyId);
+    return res.status(200).json(result);
+  } catch (err) {
+    throw new AppError("Error syncing contacts", 500);
+  }
+};
+
+export const importContacts = async (req: Request, res: Response): Promise<Response> => {
+  const { companyId } = req.user;
+  const file = req.file;
+
+  if (!file) {
+    throw new AppError("No file uploaded", 400);
+  }
+
+  try {
+    const result = await ImportService(companyId, file);
+    return res.status(200).json(result);
+  } catch (err) {
+    throw new AppError("Error importing contacts", 500);
+  }
+};
+
+export const exportContacts = async (req: Request, res: Response): Promise<Response> => {
+  const { companyId } = req.user;
+  
+  try {
+    const result = await ExportService(companyId);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=contacts.xlsx');
+    return res.send(result);
+  } catch (err) {
+    throw new AppError("Error exporting contacts", 500);
+  }
+};
+
+export const exportItems = async (req: Request, res: Response): Promise<Response> => {
+  const { id } = req.params;
+  const { companyId } = req.user;
+  
+  try {
+    const result = await ExportService(companyId, id);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=contact_items.xlsx');
+    return res.send(result);
+  } catch (err) {
+    throw new AppError("Error exporting contact items", 500);
+  }
 };

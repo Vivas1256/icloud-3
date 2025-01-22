@@ -9,7 +9,7 @@ import UpdateService from "../services/TagServices/UpdateService";
 import ShowService from "../services/TagServices/ShowService";
 import DeleteService from "../services/TagServices/DeleteService";
 import SimpleListService from "../services/TagServices/SimpleListService";
-import SyncTagService from "../services/TagServices/SyncTagsService";
+import { SyncTicketTags, SyncContactTags } from "../services/TagServices/SyncTagsService";
 import KanbanListService from "../services/TagServices/KanbanListService";
 
 type IndexQuery = {
@@ -122,7 +122,14 @@ export const syncTags = async (
   const data = req.body;
   const { companyId } = req.user;
 
-  const tags = await SyncTagService({ ...data, companyId });
+  let tags;
+  if (data.ticketId) {
+    tags = await SyncTicketTags({ ...data, companyId });
+  } else if (data.contactId) {
+    tags = await SyncContactTags({ ...data, companyId });
+  } else {
+    throw new AppError("ERR_MISSING_ID", 400);
+  }
 
   return res.json(tags);
 };

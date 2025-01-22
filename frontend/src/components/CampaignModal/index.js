@@ -16,10 +16,7 @@ import {
   Box,
   Tab,
   Tabs,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
+  Typography
 } from "@material-ui/core";
 import { green } from "@material-ui/core/colors";
 import { makeStyles } from "@material-ui/core/styles";
@@ -77,6 +74,7 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
   const { user } = useContext(AuthContext);
   const { companyId } = user;
   const [file, setFile] = useState(null);
+  const userTimezone = moment.tz.guess();
 
   const initialState = {
     name: "",
@@ -85,18 +83,13 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
     message3: "",
     message4: "",
     message5: "",
-    confirmationMessage1: "",
-    confirmationMessage2: "",
-    confirmationMessage3: "",
-    confirmationMessage4: "",
-    confirmationMessage5: "",
     status: "Inactiva",
-    confirmation: false,
-    scheduledAt: "",
+    scheduledAt: moment().add(1, 'minutes').format('YYYY-MM-DDTHH:mm'),
     whatsappId: "",
     contactListId: "",
     tagListId: "Ninguna",
     companyId,
+    timezone: userTimezone
   };
 
   const [campaign, setCampaign] = useState(initialState);
@@ -160,26 +153,26 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
           console.error("Error retrieving tags:", error);
         });
         
-        if (campaignId) {
-          api.get(`/campaigns/${campaignId}`).then(({ data }) => {
-            setCampaign((prev) => {
-              let prevCampaignData = { ...prev };
-  
-              Object.entries(data).forEach(([key, value]) => {
-                if (key === "scheduledAt" && value !== "" && value !== null) {
-                  // Convertir UTC a hora local
-                  prevCampaignData[key] = moment.utc(value).local().format("YYYY-MM-DDTHH:mm");
-                } else {
-                  prevCampaignData[key] = value === null ? "" : value;
-                }
-              });
-  
-              return prevCampaignData;
+      if (campaignId) {
+        api.get(`/campaigns/${campaignId}`).then(({ data }) => {
+          setCampaign((prev) => {
+            let prevCampaignData = { ...prev };
+
+            Object.entries(data).forEach(([key, value]) => {
+              if (key === "scheduledAt" && value !== "" && value !== null) {
+                // Convertir UTC a hora local
+                prevCampaignData[key] = moment.utc(value).tz(userTimezone).format("YYYY-MM-DDTHH:mm");
+              } else {
+                prevCampaignData[key] = value === null ? "" : value;
+              }
             });
+
+            return prevCampaignData;
           });
-        }
+        });
       }
-    }, [campaignId, initialValues, companyId]);
+    }
+  }, [campaignId, initialValues, companyId, userTimezone]);
 
   useEffect(() => {
     const now = moment();
@@ -210,12 +203,14 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
       const dataValues = {};
       Object.entries(values).forEach(([key, value]) => {
         if (key === "scheduledAt" && value !== "" && value !== null) {
-          // Convert local time to UTC
-          dataValues[key] = moment.tz(value, moment.tz.guess()).utc().format("YYYY-MM-DD HH:mm:ss");
+          // Convertir hora local a UTC
+          dataValues[key] = moment.tz(value, userTimezone).utc().format();
         } else {
           dataValues[key] = value === "" ? null : value;
         }
       });
+
+      dataValues.timezone = userTimezone;
   
       if (!dataValues.whatsappId) {
         throw new Error(i18n.t("campaigns.errors.noWhatsapp"));
@@ -316,23 +311,6 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
     );
   };
 
-  const renderConfirmationMessageField = (identifier) => {
-    return (
-      <Field
-        as={TextField}
-        id={identifier}
-        name={identifier}
-        fullWidth
-        rows={5}
-        label={i18n.t(`campaigns.dialog.form.${identifier}`)}
-        placeholder={i18n.t("campaigns.dialog.form.messagePlaceholder")}
-        multiline={true}
-        variant="outlined"
-        disabled={!campaignEditable && campaign.status !== "CANCELADA"}
-      />
-    );
-  };
-
   return (
     <div className={classes.root}>
       <ConfirmationModal
@@ -417,8 +395,7 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                       )}
                       disabled={!campaignEditable}
                     />
-                  </Grid>
-                  <Grid item xs={12} md={4}>
+                    <Grid item xs={12} md={4}>
                     <Autocomplete
                       options={memoizedWhatsapps}
                       getOptionLabel={(option) => option.name}
@@ -449,9 +426,10 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                       }}
                       inputProps={{
                         step: 60, // 1 minuto
+                        min: moment().add(1, 'minutes').format('YYYY-MM-DDTHH:mm')
                       }}
                       error={touched.scheduledAt && Boolean(errors.scheduledAt)}
-                      helperText={touched.scheduledAt && errors.scheduledAt}
+                      helperText={touched.scheduledAt && errors.scheduledAt ? errors.scheduledAt : `Hora local: ${moment(values.scheduledAt).format('YYYY-MM-DD HH:mm')}`}
                       variant="outlined"
                       fullWidth
                       className={classes.textField}
@@ -478,30 +456,10 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                       disabled={!campaignEditable}
                     />
                   </Grid>
-                  <Grid item xs={12} md={4}>
-                    <FormControl
-                      variant="outlined"
-                      margin="dense"
-                      fullWidth
-                      className={classes.formControl}
-                    >
-                      <InputLabel id="confirmation-selection-label">
-                        {i18n.t("campaigns.dialog.form.confirmation")}
-                      </InputLabel>
-                      <Field
-                        as={Select}
-                        label={i18n.t("campaigns.dialog.form.confirmation")}
-                        placeholder={i18n.t("campaigns.dialog.form.confirmation")}
-                        labelId="confirmation-selection-label"
-                        id="confirmation"
-                        name="confirmation"
-                        error={touched.confirmation && Boolean(errors.confirmation)}
-                        disabled={!campaignEditable}
-                      >
-                        <MenuItem value={false}>Desabilitada</MenuItem>
-                        <MenuItem value={true}>Habilitada</MenuItem>
-                      </Field>
-                    </FormControl>
+                  <Grid item xs={12}>
+                    <Typography variant="caption" color="textSecondary">
+                      {`Zona horaria: ${userTimezone}`}
+                    </Typography>
                   </Grid>
                   <Grid item xs={12}>
                     <Tabs
@@ -520,86 +478,11 @@ const CampaignModal = ({ open, onClose, campaignId, initialValues, onSave, reset
                       <Tab label="Msg. 5" />
                     </Tabs>
                     <Box mt={2}>
-                      {messageTab === 0 && (
-                        <>
-                          {values.confirmation ? (
-                            <Grid container spacing={2}>
-                              <Grid item xs={12} md={8}>
-                                {renderMessageField("message1")}
-                              </Grid>
-                              <Grid item xs={12} md={4}>
-                                {renderConfirmationMessageField("confirmationMessage1")}
-                              </Grid>
-                            </Grid>
-                          ) : (
-                            renderMessageField("message1")
-                          )}
-                        </>
-                      )}
-                      {messageTab === 1 && (
-                        <>
-                          {values.confirmation ? (
-                            <Grid container spacing={2}>
-                              <Grid item xs={12} md={8}>
-                                {renderMessageField("message2")}
-                              </Grid>
-                              <Grid item xs={12} md={4}>
-                                {renderConfirmationMessageField("confirmationMessage2")}
-                              </Grid>
-                            </Grid>
-                          ) : (
-                            renderMessageField("message2")
-                          )}
-                        </>
-                      )}
-                      {messageTab === 2 && (
-                        <>
-                          {values.confirmation ? (
-                            <Grid container spacing={2}>
-                              <Grid item xs={12} md={8}>
-                                {renderMessageField("message3")}
-                              </Grid>
-                              <Grid item xs={12} md={4}>
-                                {renderConfirmationMessageField("confirmationMessage3")}
-                              </Grid>
-                            </Grid>
-                          ) : (
-                            renderMessageField("message3")
-                          )}
-                        </>
-                      )}
-                      {messageTab === 3 && (
-                        <>
-                          {values.confirmation ? (
-                            <Grid container spacing={2}>
-                              <Grid item xs={12} md={8}>
-                                {renderMessageField("message4")}
-                              </Grid>
-                              <Grid item xs={12} md={4}>
-                                {renderConfirmationMessageField("confirmationMessage4")}
-                              </Grid>
-                            </Grid>
-                          ) : (
-                            renderMessageField("message4")
-                          )}
-                        </>
-                      )}
-                      {messageTab === 4 && (
-                        <>
-                          {values.confirmation ? (
-                            <Grid container spacing={2}>
-                              <Grid item xs={12} md={8}>
-                                {renderMessageField("message5")}
-                              </Grid>
-                              <Grid item xs={12} md={4}>
-                                {renderConfirmationMessageField("confirmationMessage5")}
-                              </Grid>
-                            </Grid>
-                          ) : (
-                            renderMessageField("message5")
-                          )}
-                        </>
-                      )}
+                      {messageTab === 0 && renderMessageField("message1")}
+                      {messageTab === 1 && renderMessageField("message2")}
+                      {messageTab === 2 && renderMessageField("message3")}
+                      {messageTab === 3 && renderMessageField("message4")}
+                      {messageTab === 4 && renderMessageField("message5")}
                     </Box>
                   </Grid>
                   {(campaign.mediaPath || attachment) && (

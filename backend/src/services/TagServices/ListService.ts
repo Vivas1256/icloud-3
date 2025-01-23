@@ -1,149 +1,75 @@
-import { Transaction } from "sequelize";
-import Tag from "../../models/Tag";
-import Ticket from "../../models/Ticket";
-import TicketTag from "../../models/TicketTag";
+import { head } from "lodash";
+import XLSX from "xlsx";
+import { has } from "lodash";
 import Contact from "../../models/Contact";
-import ContactTag from "../../models/ContactTag";
-import AppError from "../../errors/AppError";
+import CheckContactNumber from "../WbotServices/CheckNumber";
 import { logger } from "../../utils/logger";
-import db from "../../database";
 
-interface TaggableItem {
-  id: number;
-  tags: Tag[];
-}
+export async function ImportContacts(
+  companyId: number,
+  file: Express.Multer.File | undefined
+) {
+  const workbook = XLSX.readFile(file?.path as string);
+  const worksheet = head(Object.values(workbook.Sheets)) as any;
+  const rows: any[] = XLSX.utils.sheet_to_json(worksheet, { header: 0 });
+  const contacts = rows.map(row => {
+    let name = "";
+    let number = "";
+    let email = "";
 
-interface SyncRequest<T> {
-  tags: Tag[];
-  itemId: number;
-  include?: any[];
-}
-
-class SyncTagsService {
-  public static async syncTicketTags({
-    tags,
-    itemId: ticketId,
-    include = [Tag]
-  }: SyncRequest<Ticket>): Promise<Ticket> {
-    try {
-      return await this.executeSync({
-        itemId: ticketId,
-        tags,
-        model: Ticket,
-        tagModel: TicketTag,
-        foreignKey: 'ticketId',
-        include
-      });
-    } catch (error) {
-      logger.error(`Error syncing ticket tags: ${error}`);
-      throw new AppError('Failed to sync ticket tags', 500);
-    }
-  }
-
-  public static async syncContactTags({
-    tags,
-    itemId: contactId,
-    include = [Tag]
-  }: SyncRequest<Contact>): Promise<Contact> {
-    try {
-      return await this.executeSync({
-        itemId: contactId,
-        tags,
-        model: Contact,
-        tagModel: ContactTag,
-        foreignKey: 'contactId',
-        include
-      });
-    } catch (error) {
-      logger.error(`Error syncing contact tags: ${error}`);
-      throw new AppError('Failed to sync contact tags', 500);
-    }
-  }
-
-  private static async executeSync<T extends TaggableItem>({
-    itemId,
-    tags,
-    model,
-    tagModel,
-    foreignKey,
-    include
-  }: {
-    itemId: number;
-    tags: Tag[];
-    model: any;
-    tagModel: any;
-    foreignKey: string;
-    include: any[];
-  }): Promise<T> {
-    const transaction: Transaction = await db.transaction();
-
-    try {
-      const item = await this.findItem(model, itemId, include);
-      const tagList = this.prepareTagList(tags, itemId, foreignKey);
-
-      await this.updateTags(tagModel, tagList, itemId, foreignKey, transaction);
-      await item.reload({ transaction });
-
-      await transaction.commit();
-      return item;
-    } catch (error) {
-      await transaction.rollback();
-      throw error;
-    }
-  }
-
-  private static async findItem<T>(
-    model: any,
-    itemId: number,
-    include: any[]
-  ): Promise<T> {
-    const item = await model.findByPk(itemId, { include });
-    
-    if (!item) {
-      throw new AppError(`${model.name} not found`, 404);
+    if (has(row, "nome") || has(row, "Nome")) {
+      name = row["nome"] || row["Nome"];
     }
 
-    return item;
-  }
+    if (
+      has(row, "numero") ||
+      has(row, "número") ||
+      has(row, "Numero") ||
+      has(row, "Número")
+    ) {
+      number = row["numero"] || row["número"] || row["Numero"] || row["Número"];
+      number = `${number}`.replace(/\D/g, "");
+    }
 
-  private static prepareTagList(
-    tags: Tag[],
-    itemId: number,
-    foreignKey: string
-  ): object[] {
-    return tags.map(tag => ({
-      tagId: tag.id,
-      [foreignKey]: itemId
-    }));
-  }
+    if (
+      has(row, "email") ||
+      has(row, "e-mail") ||
+      has(row, "Email") ||
+      has(row, "E-mail")
+    ) {
+      email = row["email"] || row["e-mail"] || row["Email"] || row["E-mail"];
+    }
 
-  private static async updateTags(
-    tagModel: any,
-    tagList: object[],
-    itemId: number,
-    foreignKey: string,
-    transaction: Transaction
-  ): Promise<void> {
-    await tagModel.destroy({
-      where: { [foreignKey]: itemId },
-      transaction
+    return { name, number, email, companyId };
+  });
+
+  const contactList: Contact[] = [];
+
+  for (const contact of contacts) {
+    const [newContact, created] = await Contact.findOrCreate({
+      where: {
+        number: `${contact.number}`,
+        companyId: contact.companyId
+      },
+      defaults: contact
     });
-
-    if (tagList.length > 0) {
-      await tagModel.bulkCreate(tagList, { transaction });
+    if (created) {
+      contactList.push(newContact);
     }
   }
+
+  if (contactList) {
+    for (let newContact of contactList) {
+      try {
+        const response = await CheckContactNumber(newContact.number, companyId);
+        const number = response.jid.replace(/\D/g, "");
+        newContact.number = number;
+        await newContact.save();
+      } catch (e) {
+        logger.error(`Número de contato inválido: ${newContact.number}`);
+      }
+    }
+  }
+
+  return contactList;
 }
-
-export const SyncTicketTags = async (request: SyncRequest<Ticket>): Promise<Ticket> => {
-  return SyncTagsService.syncTicketTags(request);
-};
-
-export const SyncContactTags = async (request: SyncRequest<Contact>): Promise<Contact> => {
-  return SyncTagsService.syncContactTags(request);
-};
-
-export default {
-  SyncTicketTags,
-  SyncContactTags
-};

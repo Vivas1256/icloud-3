@@ -1,50 +1,93 @@
-import express from "express";
+import { Router } from "express";
+import multer from "multer";
 import isAuth from "../middleware/isAuth";
-
+import uploadConfig from "../config/upload";
 import * as ContactController from "../controllers/ContactController";
 import * as ImportPhoneContactsController from "../controllers/ImportPhoneContactsController";
-import routes from "./contactListRoutes";
-import uploadConfig from "../config/upload";
-import multer from "multer";
 
-const contactRoutes = express.Router();
-
+const contactRoutes = Router();
 const upload = multer(uploadConfig);
 
-// Rutas existentes
+/**
+ * Contact Management Routes
+ * @swagger
+ * tags:
+ *   name: Contacts
+ *   description: Contact management endpoints
+ */
+
+// Import Phone Contacts
 contactRoutes.post(
   "/contacts/import",
   isAuth,
   ImportPhoneContactsController.store
 );
 
-routes.post(
+// Upload Contacts File
+contactRoutes.post(
   "/contacts/upload",
   isAuth,
   upload.array("file"),
   ContactController.upload
 );
 
-contactRoutes.get("/contacts", isAuth, ContactController.index);
+// List All Contacts
+contactRoutes.get(
+  "/contacts",
+  isAuth,
+  ContactController.index
+);
 
-contactRoutes.get("/contacts/list", isAuth, ContactController.list);
+// Get Contacts List
+contactRoutes.get(
+  "/contacts/list",
+  isAuth,
+  ContactController.list
+);
 
-contactRoutes.get("/contacts/:contactId", isAuth, ContactController.show);
+// Show Contact Details
+contactRoutes.get(
+  "/contacts/:contactId",
+  isAuth,
+  ContactController.show
+);
 
-contactRoutes.post("/contacts", isAuth, ContactController.store);
+// Create New Contact
+contactRoutes.post(
+  "/contacts",
+  isAuth,
+  ContactController.store
+);
 
-contactRoutes.put("/contacts/:contactId", isAuth, ContactController.update);
+// Update Contact
+contactRoutes.put(
+  "/contacts/:contactId",
+  isAuth,
+  ContactController.update
+);
 
-contactRoutes.delete("/contacts/:contactId", isAuth, ContactController.remove);
+// Delete Contact
+contactRoutes.delete(
+  "/contacts/:contactId",
+  isAuth,
+  ContactController.remove
+);
 
-contactRoutes.get("/contact", isAuth, ContactController.getContactVcard);
+// Get Contact VCard
+contactRoutes.get(
+  "/contact",
+  isAuth,
+  ContactController.getContactVcard
+);
 
-// Rutas nuevas o modificadas
+// Sync WhatsApp Contacts
+contactRoutes.post(
+  "/contacts/sync",
+  isAuth,
+  ContactController.syncContacts
+);
 
-// Ruta para sincronizar contactos de WhatsApp
-contactRoutes.post("/contacts/sync", isAuth, ContactController.syncContacts);
-
-// Ruta para importar contactos desde Excel
+// Import Contacts from Excel
 contactRoutes.post(
   "/contacts/import-excel",
   isAuth,
@@ -52,10 +95,18 @@ contactRoutes.post(
   ContactController.importContactsFromExcel
 );
 
-// Ruta para exportar todos los contactos
-contactRoutes.get("/contacts/export", isAuth, ContactController.exportContacts);
+// Export All Contacts
+contactRoutes.get(
+  "/contacts/export",
+  isAuth,
+  ContactController.exportContacts
+);
 
-// Ruta para exportar contactos por etiqueta
-contactRoutes.get("/contacts/export/:tagId", isAuth, ContactController.exportContactsByTag);
+// Export Contacts by Tag
+contactRoutes.get(
+  "/contacts/export/:tagId",
+  isAuth,
+  ContactController.exportContactsByTag
+);
 
 export default contactRoutes;

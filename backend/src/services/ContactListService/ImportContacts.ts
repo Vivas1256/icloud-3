@@ -1,94 +1,142 @@
-import { head } from "lodash";
+import { head, has } from "lodash";
 import XLSX from "xlsx";
-import { has } from "lodash";
 import ContactListItem from "../../models/ContactListItem";
-import Tag from "../../models/Tag"; // Asegúrate de que este modelo exista
+import Tag from "../../models/Tag";
 import CheckContactNumber from "../WbotServices/CheckNumber";
 import { logger } from "../../utils/logger";
+import AppError from "../../errors/AppError";
+
+interface ContactData {
+  name: string;
+  number: string;
+  email: string;
+  tags: string[];
+  contactListId: number;
+  companyId: number;
+}
 
 export async function ImportContacts(
   contactListId: number,
   companyId: number,
   file: Express.Multer.File | undefined
-) {
-  const workbook = XLSX.readFile(file?.path as string);
-  const worksheet = head(Object.values(workbook.Sheets)) as any;
-  const rows: any[] = XLSX.utils.sheet_to_json(worksheet, { header: 0 });
-  const contacts = rows.map(row => {
-    let name = "";
-    let number = "";
-    let email = "";
-    let tags: string[] = [];
+): Promise<ContactListItem[]> {
+  if (!file) {
+    throw new AppError("File is required", 400);
+  }
 
-    if (has(row, "nome") || has(row, "Nome")) {
-      name = row["nome"] || row["Nome"];
+  try {
+    const workbook = XLSX.readFile(file.path);
+    const worksheet = head(Object.values(workbook.Sheets));
+    
+    if (!worksheet) {
+      throw new AppError("Invalid worksheet", 400);
     }
 
-    if (
-      has(row, "numero") ||
-      has(row, "número") ||
-      has(row, "Numero") ||
-      has(row, "Número")
-    ) {
-      number = row["numero"] || row["número"] || row["Numero"] || row["Número"];
-      number = `${number}`.replace(/\D/g, "");
-    }
+    const rows: any[] = XLSX.utils.sheet_to_json(worksheet, { header: 0 });
+    const contacts: ContactData[] = parseContactRows(rows, contactListId, companyId);
+    return await processContacts(contacts, companyId);
+  } catch (error) {
+    logger.error(`Error importing contacts: ${error}`);
+    throw new AppError("Error processing contact import", 500);
+  }
+}
 
-    if (
-      has(row, "email") ||
-      has(row, "e-mail") ||
-      has(row, "Email") ||
-      has(row, "E-mail")
-    ) {
-      email = row["email"] || row["e-mail"] || row["Email"] || row["E-mail"];
-    }
-
-    if (has(row, "tags") || has(row, "Tags")) {
-      tags = (row["tags"] || row["Tags"]).split(',').map((tag: string) => tag.trim());
-    }
+function parseContactRows(
+  rows: any[],
+  contactListId: number,
+  companyId: number
+): ContactData[] {
+  return rows.map(row => {
+    const name = extractField(row, ["nome", "Nome"]);
+    const number = normalizePhoneNumber(
+      extractField(row, ["numero", "número", "Numero", "Número"])
+    );
+    const email = extractField(row, ["email", "e-mail", "Email", "E-mail"]);
+    const tags = extractTags(row);
 
     return { name, number, email, tags, contactListId, companyId };
   });
+}
 
+function extractField(row: any, possibleFields: string[]): string {
+  for (const field of possibleFields) {
+    if (has(row, field)) {
+      return row[field] || "";
+    }
+  }
+  return "";
+}
+
+function normalizePhoneNumber(number: string): string {
+  return `${number}`.replace(/\D/g, "");
+}
+
+function extractTags(row: any): string[] {
+  const tagField = has(row, "tags") ? "tags" : has(row, "Tags") ? "Tags" : null;
+  if (!tagField || !row[tagField]) return [];
+  return row[tagField].split(',').map((tag: string) => tag.trim());
+}
+
+async function processContacts(
+  contacts: ContactData[],
+  companyId: number
+): Promise<ContactListItem[]> {
   const contactList: ContactListItem[] = [];
 
   for (const contact of contacts) {
-    const [newContact, created] = await ContactListItem.findOrCreate({
-      where: {
-        number: `${contact.number}`,
-        contactListId: contact.contactListId,
-        companyId: contact.companyId
-      },
-      defaults: contact
-    });
+    try {
+      const [newContact, created] = await ContactListItem.findOrCreate({
+        where: {
+          number: contact.number,
+          contactListId: contact.contactListId,
+          companyId: contact.companyId
+        },
+        defaults: contact
+      });
 
-    if (created) {
-      // Crear o encontrar las etiquetas y asociarlas al contacto
-      for (const tagName of contact.tags) {
-        const [tag] = await Tag.findOrCreate({
-          where: { name: tagName, companyId },
-          defaults: { name: tagName, color: "#000000", companyId } // Color por defecto
-        });
-        await newContact.addTag(tag);
+      if (created) {
+        await processContactTags(newContact, contact.tags, companyId);
+        await validateWhatsAppNumber(newContact, companyId);
+        contactList.push(newContact);
       }
-
-      contactList.push(newContact);
-    }
-  }
-
-  if (contactList.length > 0) {
-    for (let newContact of contactList) {
-      try {
-        const response = await CheckContactNumber(newContact.number, companyId);
-        newContact.isWhatsappValid = response.exists;
-        const number = response.jid.replace(/\D/g, "");
-        newContact.number = number;
-        await newContact.save();
-      } catch (e) {
-        logger.error(`Número de contato inválido: ${newContact.number}`);
-      }
+    } catch (error) {
+      logger.error(`Error processing contact ${contact.number}: ${error}`);
     }
   }
 
   return contactList;
-}9
+}
+
+async function processContactTags(
+  contact: ContactListItem,
+  tagNames: string[],
+  companyId: number
+): Promise<void> {
+  for (const tagName of tagNames) {
+    const [tag] = await Tag.findOrCreate({
+      where: { name: tagName, companyId },
+      defaults: { 
+        name: tagName, 
+        color: "#000000", 
+        companyId 
+      }
+    });
+    await contact.addTag(tag);
+  }
+}
+
+async function validateWhatsAppNumber(
+  contact: ContactListItem,
+  companyId: number
+): Promise<void> {
+  try {
+    const response = await CheckContactNumber(contact.number, companyId);
+    contact.isWhatsappValid = response.exists;
+    contact.number = response.jid.replace(/\D/g, "");
+    await contact.save();
+  } catch (error) {
+    logger.error(`Invalid contact number: ${contact.number}`);
+    contact.isWhatsappValid = false;
+    await contact.save();
+  }
+}

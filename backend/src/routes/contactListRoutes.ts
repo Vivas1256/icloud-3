@@ -1,23 +1,49 @@
-import express from "express";
+import { Router } from "express";
+import multer from "multer";
 import isAuth from "../middleware/isAuth";
 import uploadConfig from "../config/upload";
-
 import * as ContactListController from "../controllers/ContactListController";
-import multer from "multer";
 
-const routes = express.Router();
-
+const routes = Router();
 const upload = multer(uploadConfig);
 
-// Rutas existentes
-routes.get("/contact-lists/list", isAuth, ContactListController.findList);
+/**
+ * Contact Lists Routes
+ * @swagger
+ * tags:
+ *   name: Contact Lists
+ *   description: Contact list management endpoints
+ */
 
-routes.get("/contact-lists", isAuth, ContactListController.index);
+// List Routes
+routes.get(
+  "/contact-lists/list",
+  isAuth,
+  ContactListController.findList
+);
 
-routes.get("/contact-lists/:id", isAuth, ContactListController.show);
+// Index Route
+routes.get(
+  "/contact-lists",
+  isAuth,
+  ContactListController.index
+);
 
-routes.post("/contact-lists", isAuth, ContactListController.store);
+// Show Route
+routes.get(
+  "/contact-lists/:id",
+  isAuth,
+  ContactListController.show
+);
 
+// Store Route
+routes.post(
+  "/contact-lists",
+  isAuth,
+  ContactListController.store
+);
+
+// Upload Route
 routes.post(
   "/contact-lists/:id/upload",
   isAuth,
@@ -25,16 +51,28 @@ routes.post(
   ContactListController.upload
 );
 
-routes.put("/contact-lists/:id", isAuth, ContactListController.update);
+// Update Route
+routes.put(
+  "/contact-lists/:id",
+  isAuth,
+  ContactListController.update
+);
 
-routes.delete("/contact-lists/:id", isAuth, ContactListController.remove);
+// Delete Route
+routes.delete(
+  "/contact-lists/:id",
+  isAuth,
+  ContactListController.remove
+);
 
-// Rutas nuevas o modificadas
+// Sync WhatsApp Contacts Route
+routes.post(
+  "/contact-lists/sync",
+  isAuth,
+  ContactListController.syncContacts
+);
 
-// Ruta para sincronizar contactos de WhatsApp
-routes.post("/contact-lists/sync", isAuth, ContactListController.syncContacts);
-
-// Ruta para importar contactos desde Excel
+// Import Contacts from Excel Route
 routes.post(
   "/contact-lists/import",
   isAuth,
@@ -42,10 +80,18 @@ routes.post(
   ContactListController.importContacts
 );
 
-// Ruta para exportar todos los contactos
-routes.get("/contact-lists/export", isAuth, ContactListController.exportAllContacts);
+// Export All Contacts Route
+routes.get(
+  "/contact-lists/export",
+  isAuth,
+  ContactListController.exportAllContacts
+);
 
-// Ruta para exportar contactos de una lista específica
-routes.get("/contact-lists/:id/export", isAuth, ContactListController.exportContacts);
+// Export Specific Contact List Route
+routes.get(
+  "/contact-lists/:id/export",
+  isAuth,
+  ContactListController.exportContacts
+);
 
 export default routes;

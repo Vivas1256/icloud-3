@@ -63,7 +63,7 @@ const ScheduleSchema = Yup.object().shape({
     .required("Obrigatório"),
   contactId: Yup.number().required("Obrigatório"),
   sendAt: Yup.date()
-    .min(moment().add(1, 'minutes'), "A data deve ser pelo menos 5 minutos no futuro")
+    .min(moment().add(1, 'minutes'), "A data deve ser pelo menos 1 minuto no futuro")
     .required("Obrigatório")
 });
 
@@ -78,6 +78,7 @@ const ScheduleModal = ({ open, onClose, scheduleId, contactId, cleanContact, rel
     contactId: "",
     sendAt: moment().add(1, 'minutes').format('YYYY-MM-DDTHH:mm'),
     sentAt: "",
+    status: "PENDING",
     timezone: userTimezone
   };
 
@@ -152,29 +153,39 @@ const ScheduleModal = ({ open, onClose, scheduleId, contactId, cleanContact, rel
   };
 
   const handleSaveSchedule = async values => {
-    const localSendAt = moment.tz(values.sendAt, userTimezone);
-    const utcSendAt = localSendAt.utc();
-
-    const scheduleData = {
-      ...values,
-      sendAt: utcSendAt.format(),
-      timezone: userTimezone,
-      userId: user.id
-    };
-
     try {
+      const localSendAt = moment.tz(values.sendAt, userTimezone);
+      const utcSendAt = localSendAt.utc();
+
+      const scheduleData = {
+        ...values,
+        sendAt: utcSendAt.format(),
+        timezone: userTimezone,
+        status: 'PENDING',
+        userId: user.id,
+        companyId: user.companyId
+      };
+
+      let savedScheduleId;
+
       if (scheduleId) {
         await api.put(`/schedules/${scheduleId}`, scheduleData);
+        savedScheduleId = scheduleId;
       } else {
         const { data } = await api.post("/schedules", scheduleData);
-        scheduleId = data.id;
+        savedScheduleId = data.id;
       }
 
       if (attachment) {
         const formData = new FormData();
         formData.append("file", attachment);
-        await api.post(`/schedules/${scheduleId}/media-upload`, formData);
+        await api.post(`/schedules/${savedScheduleId}/media-upload`, formData);
       }
+
+      // Activar el mensaje programado
+      await api.post(`/schedules/${savedScheduleId}/activate`, {
+        scheduleId: savedScheduleId
+      });
 
       toast.success(i18n.t("scheduleModal.success"));
       if (reload) reload();
@@ -184,7 +195,7 @@ const ScheduleModal = ({ open, onClose, scheduleId, contactId, cleanContact, rel
       }
     } catch (err) {
       console.error(err);
-      toast.error(i18n.t("scheduleModal.error"));
+      toastError(err);
     }
     setCurrentContact(initialContact);
     setSchedule(initialState);
@@ -314,11 +325,12 @@ const ScheduleModal = ({ open, onClose, scheduleId, contactId, cleanContact, rel
                       shrink: true,
                     }}
                     inputProps={{
-                      step: 60, // 1 minuto
+                      step: 60,
                       min: moment().add(1, 'minutes').format('YYYY-MM-DDTHH:mm')
                     }}
                     error={touched.sendAt && Boolean(errors.sendAt)}
-                    helperText={touched.sendAt && errors.sendAt ? errors.sendAt : `Hora local: ${moment(values.sendAt).format('YYYY-MM-DD HH:mm')}`}
+                    helperText={touched.sendAt && errors.sendAt ? errors.sendAt : 
+                      `Hora local: ${moment(values.sendAt).format('YYYY-MM-DD HH:mm')}`}
                     variant="outlined"
                     fullWidth
                   />
